@@ -299,7 +299,7 @@ describe('Sidebar', () => {
     expect(roadmapPreview?.getAttribute('class')).toContain('dark:text-accent')
   })
 
-  it('holding Mod reveals open shortcuts beside the top four pinned notes', async () => {
+  it('holding Mod reveals every nav shortcut and the top four pinned shortcuts', async () => {
     getPinnedNotes.mockResolvedValue(
       ['One', 'Two', 'Three', 'Four', 'Five'].map((title) => ({
         path: `notes/${title.toLowerCase()}.md`,
@@ -313,15 +313,24 @@ describe('Sidebar', () => {
     const keycaps = (): string[] =>
       Array.from(pinnedSection.element().querySelectorAll('kbd'), (key) => key.textContent ?? '')
 
+    const hiddenNavKeycaps = (): number =>
+      view
+        .getByRole('navigation', { name: 'Primary' })
+        .element()
+        .querySelectorAll('button > span.invisible').length
+
     expect(keycaps()).toEqual([])
+    expect(hiddenNavKeycaps()).toBe(5) // hover-only until Mod is held
     const modKey = isApplePlatform() ? 'Meta' : 'Control'
     window.dispatchEvent(new KeyboardEvent('keydown', { key: modKey, ...MOD_KEY }))
     await vi.waitFor(() =>
       expect(keycaps().filter((key) => /\d/.test(key))).toEqual(['6', '7', '8', '9']),
     )
+    expect(hiddenNavKeycaps()).toBe(0)
 
     window.dispatchEvent(new KeyboardEvent('keyup', { key: modKey }))
     await vi.waitFor(() => expect(keycaps()).toEqual([]))
+    expect(hiddenNavKeycaps()).toBe(5)
   })
 
   it('modifier-click opens a pinned note in a new window without changing routes', async () => {

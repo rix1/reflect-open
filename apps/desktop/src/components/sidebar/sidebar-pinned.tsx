@@ -11,7 +11,6 @@ import {
 } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { displayNoteTitle } from '@reflect/core'
-import { useModKeyHeld } from '@/hooks/use-mod-key-held.ts'
 import { usePinnedNotes } from '@/hooks/use-pinned-notes.ts'
 import { useReorderPinnedNotes } from '@/hooks/use-reorder-pinned-notes.ts'
 import { keybindingFor } from '@/lib/commands/app-commands.ts'
@@ -28,15 +27,18 @@ function pinnedShortcutFor(index: number): string | null {
   return keybindingFor(`pinned.open${index + 1}`)
 }
 
+interface SidebarPinnedProps {
+  /** Reveal the open-pinned-note shortcut beside the top rows (while `Mod` is held). */
+  showShortcuts?: boolean
+}
+
 /**
  * The sidebar's Pinned section (the Mac app's "Pinned notes" shelf):
  * every pinned note, shelf-ordered, above the Recents feed. Hidden entirely
  * while nothing is pinned — an empty shelf is sidebar noise, not an affordance.
- * Holding `Mod` reveals the open-pinned-note shortcut beside the top rows.
  */
-export function SidebarPinned(): ReactElement | null {
+export function SidebarPinned({ showShortcuts = false }: SidebarPinnedProps): ReactElement | null {
   const pinned = usePinnedNotes()
-  const modHeld = useModKeyHeld()
   const reorder = useReorderPinnedNotes(pinned)
   const { settings } = useSettings()
   const { route } = useRouter()
@@ -89,7 +91,7 @@ export function SidebarPinned(): ReactElement | null {
               <SidebarSortablePinnedRow
                 key={note.path}
                 note={note}
-                shortcut={modHeld ? pinnedShortcutFor(index) : null}
+                shortcut={showShortcuts ? pinnedShortcutFor(index) : null}
               />
             ))}
           </ul>
