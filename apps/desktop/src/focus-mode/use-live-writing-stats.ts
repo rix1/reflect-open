@@ -35,7 +35,10 @@ export function useLiveWritingStats(path: string | null): WritingStats | null {
       }
     }
     const schedule = (delay: number): void => {
-      timer ??= setTimeout(recount, delay)
+      // No `??=`: React Compiler rejects logical assignment in production builds.
+      if (timer === undefined) {
+        timer = setTimeout(recount, delay)
+      }
     }
 
     schedule(0)
