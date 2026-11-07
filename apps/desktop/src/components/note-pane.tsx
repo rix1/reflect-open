@@ -8,12 +8,11 @@ import { NoteSaveAlerts } from '@/components/note-save-alerts.tsx'
 import { ProtectedNoteView } from '@/components/protected-note-view.tsx'
 import { SuggestedContactCard } from '@/components/suggested-contact-card.tsx'
 import { EditorAiKeymap } from '@/editor/ai-menu/editor-ai-keymap.tsx'
-import { FocusModeEditorExtensions } from '@/editor/focus/focus-mode-editor-extensions.tsx'
+import { FocusModeNoteExtensions } from '@/focus-mode/editor/focus-mode-note-extensions.tsx'
 import { useEditorAiMenu } from '@/editor/ai-menu/use-editor-ai-menu.tsx'
 import { editorBodyWithDefaultBullet } from '@/editor/default-bullet.ts'
 import {
   registerNoteEditorHandle,
-  reportNoteEdited,
   unregisterNoteEditorHandle,
 } from '@/editor/editor-handle-registry.ts'
 import { markModeFromSyntax } from '@/editor/mark-mode.ts'
@@ -28,7 +27,6 @@ import { useWikiLinkNavigation } from '@/editor/use-wiki-link-navigation.ts'
 import { useWikiLinkHoverPreview } from '@/editor/use-wiki-link-hover-preview.tsx'
 import { useXPostPreload } from '@/editor/use-x-post-preload.ts'
 import { cn } from '@/lib/utils.ts'
-import { useFocusModeActive } from '@/providers/focus-mode-provider.tsx'
 import { useGraphInfo } from '@/providers/graph-provider.tsx'
 import { useNoteSearchQuery, useNoteSearchReport } from '@/providers/note-find-provider.tsx'
 import {
@@ -38,8 +36,6 @@ import {
   useEditorMarkdownSyntax,
   useEditorSmoothCaretAnimation,
   useEditorSpellCheck,
-  useFocusModeDim,
-  useFocusModeTypewriter,
   useTimeFormat,
 } from '@/providers/settings-provider.tsx'
 import { useCoreServices } from '@/services/services-provider.tsx'
@@ -145,11 +141,6 @@ export function NotePaneComponent({
   const editorSmoothCaretAnimation = useEditorSmoothCaretAnimation()
   const editorDefaultBullet = useEditorDefaultBullet()
   const editorBulletAfterHeading = useEditorBulletAfterHeading()
-  // Focus mode leaves only the writing: no backlinks, contact card or grip.
-  const focusMode = useFocusModeActive()
-  const focusModeDim = useFocusModeDim()
-  const focusModeTypewriter = useFocusModeTypewriter()
-  const backlinksVisible = showBacklinks && !focusMode
   const { noteCreation, platform, linkPreview } = useCoreServices()
   const dailyNote = isDaily(path)
   const policy = deferredCreationPolicy(path)
@@ -252,15 +243,6 @@ export function NotePaneComponent({
     [bindEditor, path, dailyDate, registerHandle, autoFocus, autoFocusSelection, onAutoFocused],
   )
 
-  const onEditorChange = document.onEditorChange
-  const handleEditorChange = useCallback(
-    (markdown: string) => {
-      onEditorChange(markdown)
-      reportNoteEdited(path, markdown)
-    },
-    [onEditorChange, path],
-  )
-
   const aiMenu = useEditorAiMenu({
     path,
     sessionEpoch: document.sessionEpoch,
@@ -298,7 +280,7 @@ export function NotePaneComponent({
     return (
       <div className={cn(gutterClassName, className)}>
         <ProtectedNoteView content={document.initialContent} />
-        {backlinksVisible ? <BacklinksPanel path={path} /> : null}
+        {showBacklinks ? <BacklinksPanel path={path} /> : null}
       </div>
     )
   }
@@ -318,7 +300,7 @@ export function NotePaneComponent({
             the hook gates on it, and skipping the mount keeps the stream lean.
             Keyed by path: a note switch must not carry one card's busy/error
             state into the next note's card. */}
-        {!dailyNote && !focusMode ? <SuggestedContactCard key={path} path={path} /> : null}
+        {!dailyNote ? <SuggestedContactCard key={path} path={path} /> : null}
       </div>
 
       <NoteEditor
@@ -327,7 +309,7 @@ export function NotePaneComponent({
         // for that would throw away the cursor mid-thought.
         key={document.sessionEpoch}
         initialContent={editorSeed}
-        onChange={handleEditorChange}
+        onChange={document.onEditorChange}
         markMode={markModeFromSyntax(editorMarkdownSyntax)}
         spellCheck={editorSpellCheck}
         searchQuery={searchQuery}
@@ -337,7 +319,7 @@ export function NotePaneComponent({
         bulletAfterHeading={editorBulletAfterHeading}
         backspaceDeletesEmptyFirstBlock={dailyNote}
         // The grip drag-reorders blocks and the "+" inserts a paragraph below.
-        blockHandle={!focusMode}
+        blockHandle={true}
         resolveImageUrl={resolveImageUrl}
         resolveWikiEmbed={resolveWikiEmbed}
         resolveAssetOpenPath={resolveAssetOpenPath}
@@ -372,15 +354,10 @@ export function NotePaneComponent({
         onExitBoundary={handleExitBoundary}
       >
         <EditorAiKeymap onTrigger={aiMenu.openMenu} />
-        {focusMode ? (
-          <FocusModeEditorExtensions
-            dim={focusModeDim === 'off' ? undefined : focusModeDim}
-            typewriter={focusModeTypewriter}
-          />
-        ) : null}
+        <FocusModeNoteExtensions path={path} />
       </NoteEditor>
 
-      {backlinksVisible ? (
+      {showBacklinks ? (
         <div className={gutterClassName}>
           <BacklinksPanel path={path} />
         </div>

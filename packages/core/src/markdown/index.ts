@@ -25,8 +25,7 @@ export {
   type ParsedFrontmatter,
 } from './frontmatter.ts'
 export { parseBody } from './grammar.ts'
-export { parseNote, isTagName, hasAuthoredTitle, plainTextLines } from './extract.ts'
-export { writingStats, type WritingStats } from './writing-stats.ts'
+export { parseNote, isTagName, hasAuthoredTitle } from './extract.ts'
 export {
   scanInlineWikiLinks,
   scanInlineSegments,

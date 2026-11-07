@@ -263,9 +263,6 @@ export {
   DATE_FORMATS,
   dateFormatSchema,
   weekStartDaySchema,
-  focusModeDimSchema,
-  focusModeFontSchema,
-  focusModeStatSchema,
   getUserWeekStart,
   GRAPH_COLOR_IDS,
   aiProviderIdSchema,
@@ -275,8 +272,6 @@ export {
   type Settings,
   type EditorMarkdownSyntax,
   type EditorTextSize,
-  type FocusModeDim,
-  type FocusModeStat,
   type SidebarWidthRange,
   type ThemePreference,
   type TimeFormat,
@@ -290,6 +285,14 @@ export {
   type AiPromptMode,
 } from './settings/schema.ts'
 export { type SettingsLoadOutcome, type SettingsService } from './settings/settings-service.ts'
+export {
+  focusModeDimSchema,
+  focusModeFontSchema,
+  focusModeStatSchema,
+  type FocusModeDim,
+  type FocusModeStat,
+} from './settings/focus-mode-schema.ts'
+export { writingStats, type WritingStats } from './markdown/writing-stats.ts'
 export {
   formatDayLabel,
   formatFullDate,
@@ -419,8 +422,6 @@ export {
   isPinned,
   pinnedOrder,
   parseNote,
-  writingStats,
-  type WritingStats,
   getTaskDueDate,
   type TaskLocator,
   type TaskRow,

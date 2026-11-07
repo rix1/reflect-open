@@ -10,12 +10,13 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
-import { useLiveWritingStats } from '@/editor/use-live-writing-stats.ts'
 import { useToday } from '@/lib/use-today.ts'
 import { useFocusedDailyDate } from '@/providers/focused-daily-provider.tsx'
-import { useFocusModeStat, useSettingsService } from '@/providers/settings-provider.tsx'
+import { useSettingsService } from '@/providers/settings-provider.tsx'
 import { useRouterState } from '@/routing/router.tsx'
 import { FOCUS_MODE_STATS, formatWritingStat } from './format-writing-stat.ts'
+import { useFocusModeStat } from './use-focus-mode-settings.ts'
+import { useLiveWritingStats } from './use-live-writing-stats.ts'
 
 /**
  * Focus mode's writing counter, in the window's bottom-right corner: one

@@ -2,7 +2,6 @@ import { page } from 'vitest/browser'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import {
   registerNoteEditorHandle,
-  reportNoteEdited,
   unregisterNoteEditorHandle,
 } from '@/editor/editor-handle-registry.ts'
 import type { NoteEditorHandle } from '@/editor/note-editor.tsx'
@@ -11,11 +10,17 @@ import { act } from '@/test-utils/act.ts'
 import { renderInApp } from '@/test-utils/render-in-app.tsx'
 import '@/test-utils/locator.ts'
 import { FocusModeStats } from './focus-mode-stats.tsx'
+import { reportNoteTextChange } from './note-text-changes.ts'
 
 const PATH = 'notes/essay.md'
 
-/** A mounted editor for `PATH` holding `markdown`, unregistered when the test ends. */
-function mountEditor(markdown: string): void {
+/**
+ * A mounted focus-mode editor for `PATH`, unregistered when the test ends.
+ * Returns an edit: it replaces the text and reports the change, as the
+ * editor's doc-change handler does.
+ */
+function mountEditor(initial: string): (markdown: string) => void {
+  let markdown = initial
   const handle: NoteEditorHandle = {
     getMarkdown: () => markdown,
     setMarkdown: () => {},
@@ -32,7 +37,12 @@ function mountEditor(markdown: string): void {
     findPrevious: () => {},
   }
   registerNoteEditorHandle(PATH, handle)
+  reportNoteTextChange({ kind: 'mounted', path: PATH })
   onTestFinished(() => unregisterNoteEditorHandle(PATH, handle))
+  return (next) => {
+    markdown = next
+    reportNoteTextChange({ kind: 'edited', path: PATH })
+  }
 }
 
 async function renderStats() {
@@ -58,14 +68,14 @@ describe('FocusModeStats', () => {
   })
 
   it('recounts as the note is edited', async () => {
-    mountEditor('Hello world.')
+    const edit = mountEditor('Hello world.')
     await renderStats()
     const counter = page.getByRole('button', { name: 'Writing statistics' })
     await expect.element(counter).toHaveTextContent('2 words')
 
-    await act(() => reportNoteEdited(PATH, 'Hello there, wide world.'))
+    await act(() => edit('Hello there, wide world.'))
     await expect.element(counter).toHaveTextContent('4 words')
-    await act(() => reportNoteEdited('notes/other.md', 'Not this note at all.'))
+    await act(() => reportNoteTextChange({ kind: 'edited', path: 'notes/other.md' }))
     await new Promise((resolve) => setTimeout(resolve, 300))
     await expect.element(counter).toHaveTextContent('4 words')
   })

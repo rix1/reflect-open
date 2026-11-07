@@ -5,12 +5,7 @@ import { parseBody } from './grammar.ts'
 import { foldTag } from './keys.ts'
 import { parseInlineLink } from './link-syntax.ts'
 import { headingLevelOf } from './node-types.ts'
-import {
-  buildPlainLines,
-  buildPlainText,
-  stripAtxHeadingMarks,
-  unescapeMarkdownText,
-} from './plain-text.ts'
+import { buildPlainText, stripAtxHeadingMarks, unescapeMarkdownText } from './plain-text.ts'
 import { projectTasks } from './task-ast.ts'
 import { isWikiNodeName, wikiBracketStart } from './wiki-nodes.ts'
 import type {
@@ -49,7 +44,7 @@ export function isTagName(value: string): boolean {
 }
 
 /** Names whose source range is markup to drop from plain text. */
-function isSyntaxNode(name: string): boolean {
+export function isSyntaxNode(name: string): boolean {
   return name.endsWith('Mark') || name === 'URL' || name === 'CodeInfo' || name === 'TaskMarker'
 }
 
@@ -64,7 +59,7 @@ function isTagExcludedNode(name: string): boolean {
   )
 }
 
-function isLiteralPlainTextNode(name: string): boolean {
+export function isLiteralPlainTextNode(name: string): boolean {
   return name === 'InlineCode' || name === 'FencedCode' || name === 'CodeBlock'
 }
 
@@ -338,31 +333,6 @@ function deriveTitle(frontmatter: Frontmatter, headings: Heading[], path: string
 }
 
 /** Parse one note's full source into the stable {@link ParsedNote} contract. */
-/**
- * The plain text a reader sees in a note body (no frontmatter), one entry per
- * non-blank line: the same projection as `ParsedNote.displayText` (syntax
- * marks and URLs dropped, wiki brackets flattened, code literal), but with
- * line breaks kept. Feeds the writing statistics.
- */
-export function plainTextLines(body: string): string[] {
-  const cuts: Span[] = []
-  const literalPlainText: Span[] = []
-  parseBody(body).iterate({
-    enter: (node) => {
-      const { name, from, to } = node
-      if (isSyntaxNode(name)) {
-        cuts.push({ from, to })
-      }
-      if (isLiteralPlainTextNode(name)) {
-        literalPlainText.push({ from, to })
-      }
-      // Wiki links flatten as a whole (see `renderMarkdownText`).
-      return !isWikiNodeName(name)
-    },
-  })
-  return buildPlainLines(body, cuts, literalPlainText)
-}
-
 export function parseNote(input: { path: string; source: string }): ParsedNote {
   const { path, source } = input
   const { raw, body, bodyOffset } = splitFrontmatter(source)

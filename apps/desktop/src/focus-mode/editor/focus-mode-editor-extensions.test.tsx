@@ -152,6 +152,7 @@ describe('typewriter scrolling', () => {
     const scroller = await renderScrolling(false)
     await userEvent.keyboard('{ArrowDown>20}')
     await expect.poll(() => scroller.scrollTop).toBeGreaterThan(0)
-    expect(caretOffsetFromCenter(scroller)).toBeGreaterThan(50)
+    // Polled: under load the scroll can still be settling after the keys.
+    await expect.poll(() => caretOffsetFromCenter(scroller)).toBeGreaterThan(50)
   })
 })

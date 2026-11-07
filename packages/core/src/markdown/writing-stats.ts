@@ -1,4 +1,4 @@
-import { plainTextLines } from './extract.ts'
+import { plainTextLines } from './plain-text-lines.ts'
 import { projectTasks } from './task-ast.ts'
 
 /**

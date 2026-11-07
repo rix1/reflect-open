@@ -10,7 +10,7 @@ import { useNoteTemplates } from '@/providers/note-templates-provider.tsx'
 import { useSettingsService } from '@/providers/settings-provider.tsx'
 import { useShortcuts } from '@/providers/shortcuts-provider.tsx'
 import { useSidebar } from '@/providers/sidebar-provider.tsx'
-import { useFocusMode } from '@/providers/focus-mode-provider.tsx'
+import { useFocusMode } from '@/focus-mode/focus-mode-provider.tsx'
 import {
   useAppServices,
   useCoreServices,

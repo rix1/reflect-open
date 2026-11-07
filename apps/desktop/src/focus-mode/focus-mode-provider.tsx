@@ -10,19 +10,25 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react'
+import { useAppServices, useCoreServices } from '@/services/services-provider.tsx'
+import { FocusModeStats } from './focus-mode-stats.tsx'
 import {
   useFocusModeFont,
   useFocusModeFullscreen,
   useFocusModeTypewriter,
-} from '@/providers/settings-provider.tsx'
-import { useAppServices, useCoreServices } from '@/services/services-provider.tsx'
+} from './use-focus-mode-settings.ts'
+import './focus-mode.css'
 
 /**
  * Focus mode (⌘⇧F): a writing surface with nothing but the note. Provided
- * once per workspace so the shell (which hides its sidebars), the note panes
- * (which hide their backlinks and dim) and the command registry share one
- * source of truth. Session-only, like the sidebar: a relaunch starts with
+ * once per main window, around `WorkspaceContent`, so the shell (which hides
+ * its sidebars), the note editors (which dim) and the command registry share
+ * one source of truth. Session-only, like the sidebar: a relaunch starts with
  * the normal layout.
+ *
+ * Everything else it changes is CSS keyed off the root attributes set here
+ * (`focus-mode.css`). Outside a provider (note windows, tests that render a
+ * lone pane) focus mode is simply off.
  */
 
 interface FocusModeContextValue {
@@ -30,7 +36,9 @@ interface FocusModeContextValue {
   toggleFocusMode: () => void
 }
 
-const FocusModeContext = createContext<FocusModeContextValue | null>(null)
+const FOCUS_MODE_OFF: FocusModeContextValue = { active: false, toggleFocusMode: () => {} }
+
+const FocusModeContext = createContext<FocusModeContextValue>(FOCUS_MODE_OFF)
 
 export function FocusModeProvider({ children }: { children: ReactNode }): ReactElement {
   const [active, setActive] = useState(false)
@@ -47,6 +55,7 @@ export function FocusModeProvider({ children }: { children: ReactNode }): ReactE
       <FocusModeFullscreen active={active} />
       <FocusModeRootAttributes active={active} />
       {children}
+      {active ? <FocusModeStats /> : null}
     </FocusModeContext>
   )
 }
@@ -117,19 +126,12 @@ function FocusModeRootAttributes({ active }: { active: boolean }): null {
   return null
 }
 
-/** Focus mode state + the toggle. Use within a FocusModeProvider. */
+/** Focus mode state + the toggle; off, with a no-op toggle, outside a provider. */
 export function useFocusMode(): FocusModeContextValue {
-  const context = use(FocusModeContext)
-  if (!context) {
-    throw new Error('useFocusMode must be used within a FocusModeProvider')
-  }
-  return context
+  return use(FocusModeContext)
 }
 
-/**
- * Whether focus mode is on, or `false` outside a workspace (settings
- * previews, tests that render a lone pane).
- */
+/** Whether focus mode is on (`false` outside a provider). */
 export function useFocusModeActive(): boolean {
-  return use(FocusModeContext)?.active ?? false
+  return use(FocusModeContext).active
 }

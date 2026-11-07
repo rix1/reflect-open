@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useExtension } from '@meowdown/react'
 import { defineFocusDim, type FocusDimMode } from './focus-dim.ts'
 import { defineTypewriter } from './typewriter.ts'
+import './focus-dim.css'
 
 interface FocusModeEditorExtensionsProps {
   /** What stays at full strength while the rest dims; undefined dims nothing. */

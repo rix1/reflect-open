@@ -9,16 +9,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select.tsx'
+import { SettingsField } from '@/components/settings/field.tsx'
+import { SettingsSection } from '@/components/settings/section.tsx'
+import { SettingsSwitchField } from '@/components/settings/switch-field.tsx'
+import { useSettingsService } from '@/providers/settings-provider.tsx'
 import {
   useFocusModeDim,
   useFocusModeFont,
   useFocusModeFullscreen,
   useFocusModeTypewriter,
-  useSettingsService,
-} from '@/providers/settings-provider.tsx'
-import { SettingsField } from './field.tsx'
-import { SettingsSection } from './section.tsx'
-import { SettingsSwitchField } from './switch-field.tsx'
+} from './use-focus-mode-settings.ts'
 
 const DIM_OPTIONS: { value: FocusModeDim; label: string }[] = [
   { value: 'sentence', label: 'Sentence' },

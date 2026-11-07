@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { writingStats, type WritingStats } from '@reflect/core'
-import { noteEditorHandleFor, subscribeNoteEditors } from '@/editor/editor-handle-registry.ts'
+import { noteEditorHandleFor } from '@/editor/editor-handle-registry.ts'
+import { subscribeNoteTextChanges } from './note-text-changes.ts'
 
 // Recount at most this often while the user types: often enough to read as
 // live, rarely enough that a long note's re-parse never competes with typing.
@@ -24,34 +25,23 @@ export function useLiveWritingStats(path: string | null): WritingStats | null {
       return
     }
     let timer: ReturnType<typeof setTimeout> | undefined
-    // The text to count next: an edit's Markdown, or a read of the mounted
-    // editor, deferred so it never runs inside the editor's own commit.
-    let pending: (() => string | null) | undefined
-
+    // The mounted editor is read on a timer, never inside its own
+    // transaction, and at most once per interval while the user types.
     const recount = (): void => {
       timer = undefined
-      const markdown = pending?.()
-      pending = undefined
-      if (markdown != null) {
+      const markdown = noteEditorHandleFor(path)?.getMarkdown()
+      if (markdown !== undefined) {
         setCounted({ path, stats: writingStats(markdown) })
       }
     }
-    const schedule = (read: () => string | null, delay: number): void => {
-      pending = read
+    const schedule = (delay: number): void => {
       timer ??= setTimeout(recount, delay)
     }
-    const readEditor = (): string | null => noteEditorHandleFor(path)?.getMarkdown() ?? null
 
-    schedule(readEditor, 0)
-    const unsubscribe = subscribeNoteEditors((event) => {
-      if (event.path !== path) {
-        return
-      }
-      if (event.kind === 'mounted') {
-        schedule(readEditor, 0)
-      } else {
-        const { markdown } = event
-        schedule(() => markdown, RECOUNT_INTERVAL_MS)
+    schedule(0)
+    const unsubscribe = subscribeNoteTextChanges((change) => {
+      if (change.path === path) {
+        schedule(change.kind === 'mounted' ? 0 : RECOUNT_INTERVAL_MS)
       }
     })
     return () => {

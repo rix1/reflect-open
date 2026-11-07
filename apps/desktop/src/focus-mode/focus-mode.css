@@ -1,0 +1,62 @@
+/* Focus mode (⌘⇧F). Imported by `focus-mode-provider.tsx`, which sets
+   `data-focus-mode` (and `data-focus-typewriter`, `--focus-mode-font`) on the
+   root. Kept out of `styles/index.css` so the feature stays in its own folder.
+   Un-layered on purpose: these rules must beat meowdown's layered styles.
+
+   The shell has already dropped the sidebars; these rules turn what is left
+   into a writing surface: a narrower ~66-character column (overriding
+   full-width notes too), a slightly larger reading size, the user's
+   focus-mode font if they set one, and a daily stream where only the day you
+   are in is at full strength. */
+:root[data-focus-mode='true'] {
+  --editor-content-gutter: max(2rem, calc((100% - 36rem) / 2));
+}
+:root[data-focus-mode='true'] .reflect-note-surface {
+  font-family: var(--focus-mode-font, var(--font-reading, var(--font-sans)));
+  font-size: max(var(--editor-font-size, var(--text-base)), var(--text-lg));
+  line-height: var(--leading-relaxed, 1.7);
+}
+:root[data-focus-mode='true'] .reflect-daily-day {
+  border-bottom-color: transparent;
+  transition: opacity 200ms ease;
+}
+:root[data-focus-mode='true'] .reflect-daily-day:not(:focus-within) {
+  opacity: 0.35;
+}
+:root[data-focus-mode='true'] .reflect-daily-subject {
+  color: var(--text-muted);
+}
+/* meowdown keeps every editor's current block lit, focused or not; in the
+   stream only the day you are writing in should have one. */
+:root[data-focus-mode='true']
+  .reflect-daily-day
+  .ProseMirror[data-focus-dim]:not(.ProseMirror-focused)
+  :is(.reflect-focus-current, .reflect-focus-current *) {
+  color: var(--focus-dim-color);
+}
+
+/* Typewriter scrolling centers the caret line, so the first and last lines
+   need room above and below them to reach the middle of the window. A single
+   note gets it inside its editor; the daily stream only needs it after the
+   last day. */
+:root[data-focus-typewriter='true'] .reflect-note-surface {
+  padding-block: 40vh 50vh;
+}
+:root[data-focus-typewriter='true'] .reflect-daily-day .reflect-note-surface {
+  padding-block: 0;
+}
+:root[data-focus-typewriter='true'] .reflect-daily-tail {
+  height: 50vh;
+}
+
+/* Focus mode leaves only the writing. These hooks are upstream's own stable
+   names (the regions' accessible names and meowdown's block-handle test id),
+   so the note pane needs no focus-mode branches; `focus-mode.test.tsx` fails
+   if one of them is renamed. */
+:root[data-focus-mode='true'] {
+  [aria-label='Incoming backlinks'],
+  [aria-label='Suggested contact'],
+  [data-testid='block-handle'] {
+    display: none;
+  }
+}
