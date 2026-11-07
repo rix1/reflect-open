@@ -8,11 +8,13 @@ import {
   createTestIdService,
   createTestNoteFileService,
   createTestPlatformService,
+  seedNotes,
   type TestNoteFileService,
   type TestPlatformOptions,
 } from '@reflect/core/testing'
 import { PaletteProvider, usePalette } from '@/components/command-palette/palette-provider.tsx'
 import type { NoteEditorHandle } from '@/editor/note-editor.tsx'
+import { FocusModeProvider, useFocusMode } from '@/providers/focus-mode-provider.tsx'
 import { NoteTemplatesProvider } from '@/providers/note-templates-provider.tsx'
 import { ShortcutsProvider } from '@/providers/shortcuts-provider.tsx'
 import { UpdateProvider } from '@/providers/update-provider.tsx'
@@ -104,12 +106,25 @@ beforeEach(() => {
   editorProbe.hoverRenderer = null
 })
 
+function FocusModeToggle(): ReactElement {
+  const { toggleFocusMode } = useFocusMode()
+  return (
+    <button type="button" onClick={toggleFocusMode}>
+      Toggle focus mode
+    </button>
+  )
+}
+
 function PaletteProbe(): ReactElement {
   const { open, query } = usePalette()
   return <output data-testid="palette">{JSON.stringify({ open, query })}</output>
 }
 
-async function renderRoute(route: Route, platform?: TestPlatformOptions) {
+async function renderRoute(
+  route: Route,
+  platform?: TestPlatformOptions,
+  seed?: (core: ReturnType<typeof createTestCoreServices>) => void,
+) {
   noteFile = createTestNoteFileService({ files })
   const core = createTestCoreServices({
     database: createWasmTestDatabaseService(),
@@ -118,6 +133,7 @@ async function renderRoute(route: Route, platform?: TestPlatformOptions) {
     id: createTestIdService({ seed: 'route-content' }),
     platform: createTestPlatformService(platform),
   })
+  seed?.(core)
   return await renderInApp(
     <PaletteProvider>
       {/* A bounded viewport, like the app shell's: the stream virtualizes its rows. */}
@@ -125,6 +141,7 @@ async function renderRoute(route: Route, platform?: TestPlatformOptions) {
         <RouteContent />
       </div>
       <PaletteProbe />
+      <FocusModeToggle />
     </PaletteProvider>,
     {
       core,
@@ -136,7 +153,9 @@ async function renderRoute(route: Route, platform?: TestPlatformOptions) {
         <UpdateProvider autoCheck={false}>
           <ShortcutsProvider>
             <NoteTemplatesProvider>
-              <V1ImportProvider>{children}</V1ImportProvider>
+              <V1ImportProvider>
+                <FocusModeProvider>{children}</FocusModeProvider>
+              </V1ImportProvider>
             </NoteTemplatesProvider>
           </ShortcutsProvider>
         </UpdateProvider>
@@ -169,6 +188,25 @@ describe('RouteContent', () => {
 
     // The navigated-to note takes focus on mount.
     await vi.waitFor(() => expect(editorProbe.focusCalls).toContain('focus'))
+    await view.unmount()
+  })
+
+  it('drops the backlinks under a note in focus mode and brings them back after', async () => {
+    files['notes/exist.md'] = '# Hello\n\nWorld.\n'
+    const view = await renderRoute({ kind: 'note', path: 'notes/exist.md' }, undefined, (core) => {
+      seedNotes(core.database, [
+        { path: 'notes/exist.md', markdown: '# Hello\n\nWorld.\n' },
+        { path: 'notes/other.md', markdown: '# Other\n\nSee [[Hello]].\n' },
+      ])
+    })
+    const backlinks = page.getByRole('region', { name: 'Incoming backlinks' })
+    await expect.element(backlinks).toBeInTheDocument()
+
+    await page.getByRole('button', { name: 'Toggle focus mode' }).click()
+    await expect.element(backlinks).not.toBeInTheDocument()
+
+    await page.getByRole('button', { name: 'Toggle focus mode' }).click()
+    await expect.element(backlinks).toBeInTheDocument()
     await view.unmount()
   })
 

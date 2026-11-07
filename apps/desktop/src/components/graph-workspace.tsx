@@ -5,6 +5,7 @@ import { NoteWindowContent } from '@/components/note-window-content.tsx'
 import { WhatsNewDialog } from '@/components/whats-new/whats-new-dialog.tsx'
 import { WorkspaceContent } from '@/components/workspace-content.tsx'
 import { AudioMemoProvider } from '@/providers/audio-memo-provider.tsx'
+import { FocusModeProvider } from '@/providers/focus-mode-provider.tsx'
 import { FocusedDailyProvider } from '@/providers/focused-daily-provider.tsx'
 import { DeepLinkProvider } from '@/providers/deep-link-provider.tsx'
 import { NoteFindProvider } from '@/providers/note-find-provider.tsx'
@@ -38,33 +39,35 @@ export function GraphWorkspace({ graph }: GraphWorkspaceProps): ReactElement {
         <ShortcutsProvider>
           <NoteTemplatesProvider>
             <SidebarProvider>
-              {/* Above the sidebar: a recording must survive the sidebar (and its
+              <FocusModeProvider>
+                {/* Above the sidebar: a recording must survive the sidebar (and its
                   mic button) unmounting on collapse. */}
-              <AudioMemoProvider graph={graph}>
-                {/* Inside the router: deep links navigate. */}
-                <DeepLinkProvider>
-                  {/* Tracks the focused day in the daily stream so the right
+                <AudioMemoProvider graph={graph}>
+                  {/* Inside the router: deep links navigate. */}
+                  <DeepLinkProvider>
+                    {/* Tracks the focused day in the daily stream so the right
                       sidebar describes it, not just the routed day. */}
-                  <FocusedDailyProvider>
-                    <NoteFindProvider>
-                      {/* A ⌘-clicked note window is chrome-free: the
+                    <FocusedDailyProvider>
+                      <NoteFindProvider>
+                        {/* A ⌘-clicked note window is chrome-free: the
                           routed view only, no sidebar/palette shell.
                           The V1 import lives above the routed views so
                           closing settings can't orphan a running
                           import; main window only — its dialog is the
                           import's single face. */}
-                      {appWindow.isMainWindow() ? (
-                        <V1ImportProvider>
-                          <WorkspaceContent graph={graph} />
-                          <WhatsNewDialog />
-                        </V1ImportProvider>
-                      ) : (
-                        <NoteWindowContent />
-                      )}
-                    </NoteFindProvider>
-                  </FocusedDailyProvider>
-                </DeepLinkProvider>
-              </AudioMemoProvider>
+                        {appWindow.isMainWindow() ? (
+                          <V1ImportProvider>
+                            <WorkspaceContent graph={graph} />
+                            <WhatsNewDialog />
+                          </V1ImportProvider>
+                        ) : (
+                          <NoteWindowContent />
+                        )}
+                      </NoteFindProvider>
+                    </FocusedDailyProvider>
+                  </DeepLinkProvider>
+                </AudioMemoProvider>
+              </FocusModeProvider>
             </SidebarProvider>
           </NoteTemplatesProvider>
         </ShortcutsProvider>

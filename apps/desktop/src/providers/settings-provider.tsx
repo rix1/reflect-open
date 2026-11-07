@@ -64,6 +64,26 @@ function selectEditorFullWidth(settings: Settings): Settings['editorFullWidth'] 
   return settings.editorFullWidth
 }
 
+function selectFocusModeDim(settings: Settings): Settings['focusModeDim'] {
+  return settings.focusModeDim
+}
+
+function selectFocusModeTypewriter(settings: Settings): Settings['focusModeTypewriter'] {
+  return settings.focusModeTypewriter
+}
+
+function selectFocusModeFullscreen(settings: Settings): Settings['focusModeFullscreen'] {
+  return settings.focusModeFullscreen
+}
+
+function selectFocusModeFont(settings: Settings): Settings['focusModeFont'] {
+  return settings.focusModeFont
+}
+
+function selectFocusModeStat(settings: Settings): Settings['focusModeStat'] {
+  return settings.focusModeStat
+}
+
 function selectEditorDefaultBullet(settings: Settings): Settings['editorDefaultBullet'] {
   return settings.editorDefaultBullet
 }
@@ -158,6 +178,26 @@ export function useEditorTextSize(): EditorTextSize {
 
 export function useEditorFullWidth(): Settings['editorFullWidth'] {
   return useSettingsSelector(selectEditorFullWidth)
+}
+
+export function useFocusModeDim(): Settings['focusModeDim'] {
+  return useSettingsSelector(selectFocusModeDim)
+}
+
+export function useFocusModeTypewriter(): Settings['focusModeTypewriter'] {
+  return useSettingsSelector(selectFocusModeTypewriter)
+}
+
+export function useFocusModeFullscreen(): Settings['focusModeFullscreen'] {
+  return useSettingsSelector(selectFocusModeFullscreen)
+}
+
+export function useFocusModeFont(): Settings['focusModeFont'] {
+  return useSettingsSelector(selectFocusModeFont)
+}
+
+export function useFocusModeStat(): Settings['focusModeStat'] {
+  return useSettingsSelector(selectFocusModeStat)
 }
 
 export function useEditorDefaultBullet(): Settings['editorDefaultBullet'] {

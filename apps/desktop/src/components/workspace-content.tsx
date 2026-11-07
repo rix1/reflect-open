@@ -10,9 +10,11 @@ import { NoteFindBar } from '@/components/note-find-bar.tsx'
 import { RouteContent } from '@/components/route-content.tsx'
 import { ShortcutsDialog } from '@/components/shortcuts-dialog.tsx'
 import { Sidebar } from '@/components/sidebar/sidebar.tsx'
+import { FocusModeStats } from '@/components/focus-mode/focus-mode-stats.tsx'
 import { SidebarResizeHandle } from '@/components/sidebar-resize-handle.tsx'
 import { TemplateCreateDialog } from '@/components/templates/template-create-dialog.tsx'
 import { TemplatePicker } from '@/components/templates/template-picker.tsx'
+import { useFocusMode } from '@/providers/focus-mode-provider.tsx'
 import { useDailyContextTarget } from '@/providers/focused-daily-provider.tsx'
 import { useSidebar } from '@/providers/sidebar-provider.tsx'
 import { useAppShortcuts } from '@/routing/app-shortcuts.ts'
@@ -42,7 +44,11 @@ function contextSidebarFor(target: ContextSidebarTarget | null): ReactElement | 
  * mounts.
  */
 export function WorkspaceContent({ graph }: WorkspaceContentProps): ReactElement {
-  const { collapsed } = useSidebar()
+  const { collapsed: sidebarCollapsed } = useSidebar()
+  // Focus mode hides both sidebars without touching the ⌘\ state, so leaving
+  // it restores whatever layout was there before.
+  const { active: focusMode } = useFocusMode()
+  const collapsed = sidebarCollapsed || focusMode
   const commandContext = useAppShortcuts()
   // Daily routes get the day's contextual panel and note routes the note's;
   // search/settings get none (AppShell omits the region when context is absent).
@@ -63,6 +69,7 @@ export function WorkspaceContent({ graph }: WorkspaceContentProps): ReactElement
         </div>
 
         <NoteFindBar />
+        {focusMode ? <FocusModeStats /> : null}
         <CommandPalette context={commandContext} />
         <ShortcutsDialog />
         <TemplatePicker context={commandContext} />

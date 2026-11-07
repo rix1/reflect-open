@@ -77,6 +77,7 @@ function fakeContext(overrides?: Partial<CommandContext>) {
     togglePrivate: vi.fn(() => {}),
     toggleTheme: vi.fn(),
     toggleSidebar: vi.fn(),
+    toggleFocusMode: vi.fn(),
     newChat: vi.fn(),
     openNoteFind: vi.fn(),
     findNextInNote: vi.fn(),
@@ -125,6 +126,10 @@ describe('keybindingFor', () => {
     expect(keybindingFor('note.openInNewWindow')).toBe('Mod-Shift-o')
   })
 
+  it('view.toggleFocusMode keeps the V1 no-distraction shortcut', () => {
+    expect(keybindingFor('view.toggleFocusMode')).toBe('Mod-Shift-f')
+  })
+
   it('graph switch commands use command-number bindings', () => {
     expect(keybindingFor('graph.switch1')).toBe('Mod-1')
     expect(keybindingFor('graph.switch9')).toBe('Mod-9')
@@ -149,6 +154,8 @@ describe('app commands', () => {
     expect(context.toggleTheme).toHaveBeenCalled()
     await command('sidebar.toggle').run(context)
     expect(context.toggleSidebar).toHaveBeenCalled()
+    await command('view.toggleFocusMode').run(context)
+    expect(context.toggleFocusMode).toHaveBeenCalled()
     await command('audioMemo.toggle').run(context)
     expect(context.toggleAudioMemo).toHaveBeenCalled()
   })

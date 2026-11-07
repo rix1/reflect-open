@@ -34,6 +34,7 @@ async function renderDialog(): Promise<{ context: CommandContext; core: TestCore
     togglePrivate: vi.fn(() => {}),
     toggleTheme: vi.fn(),
     toggleSidebar: vi.fn(),
+    toggleFocusMode: vi.fn(),
     newChat: vi.fn(),
     openNoteFind: vi.fn(),
     findNextInNote: vi.fn(),

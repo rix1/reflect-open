@@ -85,13 +85,8 @@ function appendPlainTextChunk(
   return kept
 }
 
-/**
- * Plain text of `[start, end)` minus the cut (syntax) ranges, with wiki
- * brackets/pipes flattened. Shared by the whole-body plain text and per-task
- * text so a task renders exactly as the note's body does (emphasis marks and
- * the `[ ]` TaskMarker dropped, code kept literal).
- */
-export function plainTextOfRange(
+/** The kept text of `[start, end)`: the cut (syntax) ranges dropped, whitespace untouched. */
+function keptTextOfRange(
   body: string,
   start: number,
   end: number,
@@ -118,10 +113,38 @@ export function plainTextOfRange(
   if (pos < end) {
     kept += appendPlainTextChunk(body, pos, end, sortedLiteralRanges)
   }
-  return kept.replaceAll(/\s+/g, ' ').trim()
+  return kept
+}
+
+/**
+ * Plain text of `[start, end)` minus the cut (syntax) ranges, with wiki
+ * brackets/pipes flattened. Shared by the whole-body plain text and per-task
+ * text so a task renders exactly as the note's body does (emphasis marks and
+ * the `[ ]` TaskMarker dropped, code kept literal).
+ */
+export function plainTextOfRange(
+  body: string,
+  start: number,
+  end: number,
+  cuts: Span[],
+  literalRanges: Span[],
+): string {
+  return keptTextOfRange(body, start, end, cuts, literalRanges).replaceAll(/\s+/g, ' ').trim()
 }
 
 /** Body text minus the cut (syntax) ranges, with wiki brackets/pipes flattened. */
 export function buildPlainText(body: string, cuts: Span[], literalRanges: Span[]): string {
   return plainTextOfRange(body, 0, body.length, cuts, literalRanges)
+}
+
+/**
+ * The body's plain text as its non-blank source lines, each trimmed. Unlike
+ * {@link buildPlainText} the line structure survives, so a heading or list
+ * item without closing punctuation stays its own unit for sentence counting.
+ */
+export function buildPlainLines(body: string, cuts: Span[], literalRanges: Span[]): string[] {
+  return keptTextOfRange(body, 0, body.length, cuts, literalRanges)
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line !== '')
 }

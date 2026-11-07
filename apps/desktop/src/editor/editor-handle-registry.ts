@@ -13,9 +13,45 @@ import type { NoteEditorHandle } from '@/editor/note-editor.tsx'
  */
 const handles = new Map<string, NoteEditorHandle>()
 
+/**
+ * A change to a note's mounted editor: it mounted (read its document through
+ * {@link noteEditorHandleFor} once the commit settles), or the user edited it.
+ */
+export type NoteEditorEvent =
+  | { readonly kind: 'mounted'; readonly path: string }
+  | { readonly kind: 'edited'; readonly path: string; readonly markdown: string }
+
+type NoteEditorListener = (event: NoteEditorEvent) => void
+
+const listeners = new Set<NoteEditorListener>()
+
+function emit(event: NoteEditorEvent): void {
+  for (const listener of listeners) {
+    listener(event)
+  }
+}
+
+/**
+ * Follow every mounted editor's mounts and edits (focus mode's live writing
+ * statistics). Listeners run synchronously inside the editor's commit or
+ * change handler: defer real work. Returns the unsubscribe.
+ */
+export function subscribeNoteEditors(listener: NoteEditorListener): () => void {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
+}
+
+/** Report the user's edit of `path`'s editor (the pane's `onChange`). */
+export function reportNoteEdited(path: string, markdown: string): void {
+  emit({ kind: 'edited', path, markdown })
+}
+
 /** Make `handle` the editor for `path` (the pane's ref callback, on mount). */
 export function registerNoteEditorHandle(path: string, handle: NoteEditorHandle): void {
   handles.set(path, handle)
+  emit({ kind: 'mounted', path })
 }
 
 /**

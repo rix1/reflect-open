@@ -30,5 +30,10 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: 'You can now choose GPT-6.1 Terra and Gemini Flash Lite Latest as your AI model.',
       platforms: ['desktop', 'ios'],
     },
+    {
+      title: 'Focus mode',
+      body: 'Press ⌘⇧F to hide everything but the note, fade all but the sentence you are writing, and keep your line in the middle of the screen, with a live word count in the corner. Tune it in Settings → Focus mode.',
+      platforms: ['desktop'],
+    },
   ],
 }

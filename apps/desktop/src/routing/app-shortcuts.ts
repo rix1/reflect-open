@@ -10,6 +10,7 @@ import { useNoteTemplates } from '@/providers/note-templates-provider.tsx'
 import { useSettingsService } from '@/providers/settings-provider.tsx'
 import { useShortcuts } from '@/providers/shortcuts-provider.tsx'
 import { useSidebar } from '@/providers/sidebar-provider.tsx'
+import { useFocusMode } from '@/providers/focus-mode-provider.tsx'
 import {
   useAppServices,
   useCoreServices,
@@ -66,6 +67,7 @@ export function useAppShortcuts(): CommandContext {
     createOpen: templateCreateOpen,
   } = useNoteTemplates()
   const { toggleSidebar } = useSidebar()
+  const { toggleFocusMode } = useFocusMode()
   const { toggle: toggleAudioMemo } = useAudioMemo()
   // The hook can outlive the open graph, and its chat session with it.
   const chat = useMaybeGraphServices()?.chat
@@ -149,6 +151,7 @@ export function useAppShortcuts(): CommandContext {
       clearScrollState,
       toggleTheme: appServices.theme.toggleTheme,
       toggleSidebar,
+      toggleFocusMode,
       newChat,
       openNoteFind: () => {
         openNoteFindForPath(
@@ -192,6 +195,7 @@ export function useAppShortcuts(): CommandContext {
       openTemplatePicker,
       openTemplateCreate,
       toggleSidebar,
+      toggleFocusMode,
       newChat,
       openNoteFindForPath,
       findNextInNote,

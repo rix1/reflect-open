@@ -288,6 +288,13 @@ const APP_COMMANDS: AppCommand[] = [
     run: (context) => context.toggleSidebar(),
   },
   {
+    id: 'view.toggleFocusMode',
+    title: 'Toggle focus mode',
+    keywords: ['zen', 'distraction', 'writing', 'typewriter', 'full screen', 'dim'],
+    keybinding: 'Mod-Shift-f',
+    run: (context) => context.toggleFocusMode(),
+  },
+  {
     id: 'settings.open',
     title: 'Open settings',
     keywords: ['preferences', 'config', 'options'],

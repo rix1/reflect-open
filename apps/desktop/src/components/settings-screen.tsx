@@ -11,6 +11,7 @@ import { AudioMemosSection } from './settings/audio-memos-section.tsx'
 import { DateTimeSection } from './settings/date-time-section.tsx'
 import { DestructiveSection } from './settings/destructive-section.tsx'
 import { EditorSection } from './settings/editor-section.tsx'
+import { FocusModeSection } from './settings/focus-mode-section.tsx'
 import { ImportSection } from './settings/import-section.tsx'
 import { IntegrationsSection } from './settings/integrations-section.tsx'
 import { SearchSection } from './settings/search-section.tsx'
@@ -29,6 +30,7 @@ export function SettingsScreen(): ReactElement {
       <div className="mt-6">
         <AppearanceSection />
         <EditorSection />
+        <FocusModeSection />
         <DateTimeSection />
         <TemplatesSection />
         <AllNotesSection />

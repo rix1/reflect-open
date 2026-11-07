@@ -38,6 +38,7 @@ async function renderPicker(): Promise<void> {
     togglePrivate: vi.fn(() => {}),
     toggleTheme: vi.fn(),
     toggleSidebar: vi.fn(),
+    toggleFocusMode: vi.fn(),
     newChat: vi.fn(),
     openNoteFind: vi.fn(),
     findNextInNote: vi.fn(),

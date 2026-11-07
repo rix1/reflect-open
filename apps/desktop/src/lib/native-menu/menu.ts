@@ -88,6 +88,7 @@ export function appMenuLayout(): AppSubmenuLayout[] {
         command('history.forward'),
         separator(),
         command('sidebar.toggle'),
+        command('view.toggleFocusMode'),
         separator(),
         command('dev.toggleDevtools'),
       ],

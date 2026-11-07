@@ -31,6 +31,7 @@ import { AudioMemoProvider } from '@/providers/audio-memo-provider.tsx'
 import { NoteFindProvider, useNoteFind } from '@/providers/note-find-provider.tsx'
 import { NoteTemplatesProvider } from '@/providers/note-templates-provider.tsx'
 import { ShortcutsProvider, useShortcuts } from '@/providers/shortcuts-provider.tsx'
+import { FocusModeProvider } from '@/providers/focus-mode-provider.tsx'
 import { SidebarProvider, useSidebar } from '@/providers/sidebar-provider.tsx'
 import { MOD_KEY, NON_MOD_KEY } from '@/test-utils/mod-key.ts'
 import { renderHookInApp } from '@/test-utils/render-in-app.tsx'
@@ -144,11 +145,13 @@ async function shortcutsHook() {
           <ShortcutsProvider>
             <NoteTemplatesProvider>
               <SidebarProvider>
-                <FocusedDailyProvider>
-                  <NoteFindProvider>
-                    <AudioMemoProvider graph={GRAPH}>{children}</AudioMemoProvider>
-                  </NoteFindProvider>
-                </FocusedDailyProvider>
+                <FocusModeProvider>
+                  <FocusedDailyProvider>
+                    <NoteFindProvider>
+                      <AudioMemoProvider graph={GRAPH}>{children}</AudioMemoProvider>
+                    </NoteFindProvider>
+                  </FocusedDailyProvider>
+                </FocusModeProvider>
               </SidebarProvider>
             </NoteTemplatesProvider>
           </ShortcutsProvider>

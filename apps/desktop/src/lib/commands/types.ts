@@ -36,6 +36,8 @@ export interface CommandContext {
   toggleTheme: () => void
   /** Collapse/expand the workspace and contextual sidebars. */
   toggleSidebar: () => void
+  /** Enter/leave focus mode: only the note, dimmed around the caret. */
+  toggleFocusMode: () => void
   /** Start a fresh chat conversation. */
   newChat: () => void
   /** Open Find for the note currently targeted by {@link notePath}. */
