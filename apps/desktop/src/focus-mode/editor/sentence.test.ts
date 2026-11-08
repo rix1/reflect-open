@@ -59,6 +59,17 @@ describe('findSentenceAt', () => {
     expect(sentenceAt('Done.  |')).toBe('')
   })
 
+  it('stays in an unfinished sentence when the caret follows a space', () => {
+    expect(sentenceAt('Spadce is |')).toBe('Spadce is')
+    expect(sentenceAt('Done. Spadce is muting |')).toBe('Spadce is muting')
+    expect(sentenceAt('I wrote it, |')).toBe('I wrote it,')
+  })
+
+  it('moves on after a sentence ending in a closing quote or bracket', () => {
+    expect(sentenceAt('He said “stop.” |')).toBe('')
+    expect(sentenceAt('(It was late.) |')).toBe('')
+  })
+
   it('moves on to the next sentence from inside the whitespace between two', () => {
     expect(sentenceAt('One. | Two.')).toBe('Two.')
   })

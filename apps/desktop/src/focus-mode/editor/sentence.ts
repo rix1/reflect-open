@@ -80,13 +80,29 @@ function trimEnd(text: string, from: number, to: number): number {
 }
 
 /**
+ * Whether `sentence` is finished: typing a new sentence right after it, at the
+ * caret, would start one. Asks the segmenter itself (with a capital letter as
+ * the probe, since UAX #29 keeps "e.g. word" together), so "finished" follows
+ * the same rules as the boundaries.
+ */
+function isFinishedSentence(sentence: string): boolean {
+  const probe = `${sentence}A`
+  let lastStart = 0
+  for (const { index } of SENTENCE_SEGMENTER.segment(probe)) {
+    lastStart = index
+  }
+  return lastStart === probe.length - 1
+}
+
+/**
  * The sentence the caret at `offset` belongs to, given the boundaries from
  * {@link getSentenceBoundaries}, with its trailing whitespace dropped.
  *
  * Once whitespace follows a finished sentence, the caret has moved on: a caret
  * in that whitespace belongs to the next sentence, or, at the end of the text,
- * to a new empty sentence (an empty range at `offset`). Undefined for empty
- * text.
+ * to a new empty sentence (an empty range at `offset`). Whitespace after an
+ * unfinished sentence (the space between two words as you type) keeps the
+ * caret in it. Undefined for empty text.
  */
 export function findSentenceAt(
   text: string,
@@ -114,6 +130,9 @@ export function findSentenceAt(
   }
   if (next !== undefined) {
     return { from: next.from, to: trimEnd(text, next.from, next.to) }
+  }
+  if (!isFinishedSentence(text.slice(sentence.from, offset))) {
+    return { from: sentence.from, to: contentEnd }
   }
   return { from: offset, to: offset }
 }

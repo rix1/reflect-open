@@ -79,6 +79,15 @@ describe('focus dimming', () => {
     expect(color('.ProseMirror > p:first-child')).toBe(color('.reflect-focus-dim'))
   })
 
+  it('keeps the sentence being typed lit across the spaces between words', async () => {
+    await renderAtEnd('Done before.\n\nSpadce', 'sentence')
+    await userEvent.keyboard(' is ')
+    await expect.poll(() => texts('.reflect-focus-sentence').join('')).toBe('Spadce is')
+    await userEvent.keyboard('muting. ')
+    // A finished sentence plus a space: the caret has moved on to a new one.
+    await expect.poll(() => texts('.reflect-focus-dim').join('')).toBe('Spadce is muting. ')
+  })
+
   it('keeps hidden syntax inside the sentence it belongs to', async () => {
     await renderAtEnd('Start here. Then **bold** words.', 'sentence')
     await expect.poll(() => texts('.reflect-focus-sentence').join('')).toContain('bold')
