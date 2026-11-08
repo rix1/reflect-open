@@ -14,6 +14,7 @@ import { NoteTemplatesProvider } from '@/providers/note-templates-provider.tsx'
 import { ShortcutsProvider } from '@/providers/shortcuts-provider.tsx'
 import { SidebarProvider, useSidebar } from '@/providers/sidebar-provider.tsx'
 import { V1ImportProvider } from '@/providers/v1-import-provider.tsx'
+import { useRouterActions } from '@/routing/router.tsx'
 import { renderInApp } from '@/test-utils/render-in-app.tsx'
 import '@/test-utils/locator.ts'
 import { createWasmTestDatabaseService } from '@/test-utils/test-database.ts'
@@ -52,6 +53,23 @@ function SidebarToggle(): ReactElement {
   )
 }
 
+function NavigateButtons(): ReactElement {
+  const { navigate, back } = useRouterActions()
+  return (
+    <>
+      <button type="button" onClick={() => navigate({ kind: 'note', path: 'notes/other.md' })}>
+        Open other
+      </button>
+      <button type="button" onClick={() => navigate({ kind: 'today' }, { focusEditor: true })}>
+        Go to today
+      </button>
+      <button type="button" onClick={back}>
+        Back
+      </button>
+    </>
+  )
+}
+
 const ESSAY = '# Essay\n\nA first sentence.\n'
 const SPACING = '# Spacing\n\nFirst paragraph.\n\nSecond paragraph.\n\n- one\n- two\n'
 
@@ -81,6 +99,7 @@ function renderWorkspace(route: Route, settings?: Partial<Settings>) {
                       <FocusModeProvider>
                         <WorkspaceContent graph={GRAPH} />
                         <FocusModeToggle />
+                        <NavigateButtons />
                       </FocusModeProvider>
                       <SidebarToggle />
                     </V1ImportProvider>
@@ -127,6 +146,25 @@ describe('focus mode', () => {
     await expect.element(workspace).toBeInTheDocument()
     await expect.element(view.getByRole('complementary', { name: 'Context' })).toBeInTheDocument()
     expect(document.documentElement.dataset['focusMode']).toBeUndefined()
+  })
+
+  // Settings is one more route change (its screen needs services this harness
+  // lacks), so these stand in for it.
+  it('ends when navigating anywhere: another note, today, back', async () => {
+    const view = await renderWorkspace({ kind: 'note', path: 'notes/essay.md' })
+    const focusToggle = view.getByRole('button', { name: 'Toggle focus mode' })
+    const workspace = view.getByRole('complementary', { name: 'Workspace' })
+    await expect.element(workspace).toBeInTheDocument()
+
+    for (const name of ['Open other', 'Go to today', 'Back']) {
+      await focusToggle.click()
+      await expect.element(workspace).not.toBeInTheDocument()
+      expect(document.documentElement.dataset['focusMode'], name).toBe('true')
+
+      await view.getByRole('button', { name }).click()
+      await expect.element(workspace).toBeInTheDocument()
+      expect(document.documentElement.dataset['focusMode'], name).toBeUndefined()
+    }
   })
 
   it('leaves a sidebar the user collapsed collapsed', async () => {

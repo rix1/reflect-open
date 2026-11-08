@@ -10,6 +10,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react'
+import { useRouterState } from '@/routing/router.tsx'
 import { useAppServices, useCoreServices } from '@/services/services-provider.tsx'
 import { FocusModeStats } from './focus-mode-stats.tsx'
 import {
@@ -28,6 +29,10 @@ import './focus-mode.css'
  * its sidebars), the note editors (which dim) and the command registry share
  * one source of truth. Session-only, like the sidebar: a relaunch starts with
  * the normal layout.
+ *
+ * A session belongs to the place it was started in: any navigation (another
+ * note, settings, ⌘D, back/forward) ends it. Renaming the note does not, since
+ * the router rewrites the route in place without a new arrival.
  *
  * Everything else it changes is CSS keyed off the root attributes set here
  * (`focus-mode.css`). Outside a provider (note windows, tests that render a
@@ -48,6 +53,17 @@ export function FocusModeProvider({ children }: { children: ReactNode }): ReactE
   const toggleFocusMode = useCallback(() => {
     setActive((current) => !current)
   }, [])
+
+  // Leave on navigation. Adjusted during render rather than in an effect, so
+  // the screen navigated to never paints in focus mode. `entryId` moves on
+  // back/forward, `arrivalSeq` on every navigate (even to the same route).
+  const { entryId, arrivalSeq } = useRouterState()
+  const location = `${entryId}:${arrivalSeq}`
+  const [seenLocation, setSeenLocation] = useState(location)
+  if (location !== seenLocation) {
+    setSeenLocation(location)
+    setActive(false)
+  }
 
   const value = useMemo<FocusModeContextValue>(
     () => ({ active, toggleFocusMode }),
