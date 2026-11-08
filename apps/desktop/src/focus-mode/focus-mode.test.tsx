@@ -159,11 +159,11 @@ describe('focus mode', () => {
     for (const name of ['Open other', 'Go to today', 'Back']) {
       await focusToggle.click()
       await expect.element(workspace).not.toBeInTheDocument()
-      expect(document.documentElement.dataset['focusMode'], name).toBe('true')
+      await expect.poll(() => document.documentElement.dataset['focusMode']).toBe('true')
 
       await view.getByRole('button', { name }).click()
       await expect.element(workspace).toBeInTheDocument()
-      expect(document.documentElement.dataset['focusMode'], name).toBeUndefined()
+      await expect.poll(() => document.documentElement.dataset['focusMode']).toBeUndefined()
     }
   })
 
