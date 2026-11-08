@@ -113,5 +113,10 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: 'Turn on Reflect Capture in Safari Settings to save pages to your daily note.',
       platforms: ['darwin'],
     },
+    {
+      title: '⌘D puts you at the end of today',
+      body: 'Go to today with ⌘D and the caret waits at the end of today’s note, ready to type.',
+      platforms: ['desktop'],
+    },
   ],
 }
