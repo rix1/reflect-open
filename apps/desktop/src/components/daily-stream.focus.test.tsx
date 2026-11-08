@@ -230,14 +230,20 @@ describe('DailyStream arrival focus', () => {
   it('an ordinary arrival keeps the default start-of-note focus', async () => {
     const today = getIsoToday()
     const { view, navigate, anchored, paneFor } = await renderStream()
-
-    // A capture arrival first, so the follow-up proves the append intent is
-    // one-shot rather than sticky.
-    await act(() => navigate({ kind: 'today' }, { focusEditor: true }))
-    await act(() => navigate({ kind: 'today' }))
     await anchored(today)
 
-    const pane = paneFor(today)
+    // A capture arrival first, so the follow-up proves the append intent is
+    // one-shot rather than sticky: on a mounted day (focused right away)...
+    await act(() => navigate({ kind: 'today' }, { focusEditor: true }))
+    await expect.poll(() => focusLog.calls.at(-1)).toBe(`setSelection:${today}:end`)
+    await act(() => navigate({ kind: 'today' }))
+    await expect.poll(() => focusLog.calls.at(-1)).toBe(`setSelection:${today}:start`)
+
+    // ...and on a day that mounts on arrival (focused through its pane).
+    await act(() => navigate({ kind: 'daily', date: '2003-05-01' }, { focusEditor: true }))
+    await act(() => navigate({ kind: 'daily', date: '1999-01-01' }))
+    await anchored('1999-01-01')
+    const pane = paneFor('1999-01-01')
     await expect.element(pane).toHaveAttribute('data-autofocus', 'true')
     await expect.element(pane).toHaveAttribute('data-selection', 'start')
     await view.unmount()
