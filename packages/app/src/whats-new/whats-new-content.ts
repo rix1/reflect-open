@@ -30,5 +30,10 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: 'You can now choose GPT-6.1 Terra and Gemini Flash Lite Latest as your AI model.',
       platforms: ['desktop', 'ios'],
     },
+    {
+      title: '⌘D puts you at the end of today',
+      body: 'Go to today with ⌘D and the caret waits at the end of today’s note, ready to type.',
+      platforms: ['desktop'],
+    },
   ],
 }

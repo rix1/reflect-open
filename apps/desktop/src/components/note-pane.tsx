@@ -10,6 +10,7 @@ import { SuggestedContactCard } from '@/components/suggested-contact-card.tsx'
 import { EditorAiKeymap } from '@/editor/ai-menu/editor-ai-keymap.tsx'
 import { useEditorAiMenu } from '@/editor/ai-menu/use-editor-ai-menu.tsx'
 import { editorBodyWithDefaultBullet } from '@/editor/default-bullet.ts'
+import { focusEditorWhenShown } from '@/editor/focus-editor-when-shown.ts'
 import {
   registerNoteEditorHandle,
   unregisterNoteEditorHandle,
@@ -56,7 +57,7 @@ interface NotePaneProps {
    * double-tap).
    */
   autoFocusSelection?: 'start' | 'end' | undefined
-  /** Called once the autofocus actually happened (the editor mounted). */
+  /** Called once the autofocus attempt is over: focus landed, or it gave up. */
   onAutoFocused?: (() => void) | undefined
   /**
    * Extra classes for the pane root in every state (loading, error,
@@ -209,6 +210,8 @@ export function NotePaneComponent({
   const onSlashMenuSearch = useTemplateSlashItems(
     useCallback(() => registeredHandleRef.current?.handle ?? null, []),
   )
+  const paneRef = useRef<HTMLDivElement>(null)
+  const cancelAutoFocusRef = useRef<(() => void) | null>(null)
   const handleRef = useCallback(
     (handle: NoteEditorHandle | null) => {
       bindEditor(handle)
@@ -228,15 +231,22 @@ export function NotePaneComponent({
       if (dailyDate !== undefined) {
         registerHandle?.(dailyDate, handle)
       }
+      cancelAutoFocusRef.current?.()
+      cancelAutoFocusRef.current = null
       if (handle && autoFocus) {
         // By default the caret lands at the document start — for a seeded
-        // new note that is the empty H1, so typing names the note. An `end`
-        // selection moves it (and the scroll) to the note's content end.
-        handle.focus()
-        if (autoFocusSelection === 'end') {
-          handle.setSelection('end')
-        }
-        onAutoFocused?.()
+        // new note that is the empty H1, so typing names the note. The
+        // request is consumed only once the attempt is over: a daily-stream
+        // row can still be hidden (unmeasured) when its editor mounts.
+        cancelAutoFocusRef.current = focusEditorWhenShown(
+          handle,
+          autoFocusSelection,
+          () => paneRef.current,
+          () => {
+            cancelAutoFocusRef.current = null
+            onAutoFocused?.()
+          },
+        )
       }
     },
     [bindEditor, path, dailyDate, registerHandle, autoFocus, autoFocusSelection, onAutoFocused],
@@ -291,7 +301,7 @@ export function NotePaneComponent({
   const editorSeed = editorBodyWithDefaultBullet(document.initialContent, editorDefaultBullet)
 
   return (
-    <div className={cn('relative', className)} aria-label={`Editing ${path}`}>
+    <div ref={paneRef} className={cn('relative', className)} aria-label={`Editing ${path}`}>
       <div className={gutterClassName}>
         <NoteSaveAlerts document={document} assetSaveError={saveError} />
 
