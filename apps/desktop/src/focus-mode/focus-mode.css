@@ -1,20 +1,44 @@
 /* Focus mode (⌘⇧F). Imported by `focus-mode-provider.tsx`, which sets
-   `data-focus-mode` (and `data-focus-typewriter`, `--focus-mode-font`) on the
-   root. Kept out of `styles/index.css` so the feature stays in its own folder.
-   Un-layered on purpose: these rules must beat meowdown's layered styles.
+   `data-focus-mode`, `data-focus-typewriter`, `data-focus-paragraph-spacing`
+   and the `--focus-mode-*` typography variables on the root. Kept out of
+   `styles/index.css` so the feature stays in its own folder. Un-layered on
+   purpose: these rules must beat meowdown's layered styles.
 
    The shell has already dropped the sidebars; these rules turn what is left
-   into a writing surface: a narrower ~66-character column (overriding
-   full-width notes too), a slightly larger reading size, the user's
-   focus-mode font if they set one, and a daily stream where only the day you
-   are in is at full strength. */
+   into a writing surface tuned like iA Writer: the user's font, size and line
+   length (defaults 17px and 64 characters, overriding full-width notes too),
+   a full blank line between paragraphs, and a daily stream where only the day
+   you are in is at full strength. */
 :root[data-focus-mode='true'] {
-  --editor-content-gutter: max(2rem, calc((100% - 36rem) / 2));
+  --focus-mode-size: var(--focus-mode-font-size, 17px);
+  /* The column in characters of a monospace font (0.6em advance) at the
+     focus size, computed once at the root so every gutter-aligned element
+     (editor, day headers, alerts) shares the same edge. */
+  --focus-mode-measure: calc(var(--focus-mode-line-width, 64) * 0.6 * var(--focus-mode-size));
+  --editor-content-gutter: max(2rem, calc((100% - var(--focus-mode-measure)) / 2));
 }
 :root[data-focus-mode='true'] .reflect-note-surface {
   font-family: var(--focus-mode-font, var(--font-reading, var(--font-sans)));
-  font-size: max(var(--editor-font-size, var(--text-base)), var(--text-lg));
-  line-height: var(--leading-relaxed, 1.7);
+  font-size: var(--focus-mode-size);
+  line-height: 1.65;
+}
+
+/* Paragraph spacing. Meowdown spaces blocks with a little padding each;
+   focus mode adds a gap between top-level blocks so paragraphs read as
+   separated by a blank line, as in iA Writer. Consecutive list items are
+   top-level blocks too (flat lists), so the gap skips a list item that
+   follows another one: a list stays together. */
+:root[data-focus-paragraph-spacing='full'] .reflect-note-surface {
+  --focus-mode-block-gap: calc(1lh - 2 * var(--meowdown-block-padding, 0.3em));
+}
+:root[data-focus-paragraph-spacing='half'] .reflect-note-surface {
+  --focus-mode-block-gap: calc(0.5lh - 2 * var(--meowdown-block-padding, 0.3em));
+}
+:root[data-focus-mode='true'] .reflect-note-surface {
+  & > * + :not(.prosemirror-flat-list),
+  & > :not(.prosemirror-flat-list) + .prosemirror-flat-list {
+    margin-block-start: max(0px, var(--focus-mode-block-gap, 0px));
+  }
 }
 :root[data-focus-mode='true'] .reflect-daily-day {
   border-bottom-color: transparent;

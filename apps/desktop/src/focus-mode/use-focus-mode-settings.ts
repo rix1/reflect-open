@@ -29,6 +29,18 @@ function selectStat(settings: Settings): Settings['focusModeStat'] {
   return settings.focusModeStat
 }
 
+function selectFontSize(settings: Settings): Settings['focusModeFontSize'] {
+  return settings.focusModeFontSize
+}
+
+function selectLineWidth(settings: Settings): Settings['focusModeLineWidth'] {
+  return settings.focusModeLineWidth
+}
+
+function selectParagraphSpacing(settings: Settings): Settings['focusModeParagraphSpacing'] {
+  return settings.focusModeParagraphSpacing
+}
+
 /** What focus mode keeps at full strength: a sentence, a paragraph, or everything. */
 export function useFocusModeDim(): Settings['focusModeDim'] {
   return useSelector(useSettingsService(), selectDim, isDeepEqual)
@@ -52,4 +64,19 @@ export function useFocusModeFont(): Settings['focusModeFont'] {
 /** The statistic the focus-mode counter shows. */
 export function useFocusModeStat(): Settings['focusModeStat'] {
   return useSelector(useSettingsService(), selectStat, isDeepEqual)
+}
+
+/** Focus mode's text size, in CSS pixels. */
+export function useFocusModeFontSize(): Settings['focusModeFontSize'] {
+  return useSelector(useSettingsService(), selectFontSize, isDeepEqual)
+}
+
+/** Focus mode's column width, in monospace characters. */
+export function useFocusModeLineWidth(): Settings['focusModeLineWidth'] {
+  return useSelector(useSettingsService(), selectLineWidth, isDeepEqual)
+}
+
+/** The space focus mode leaves between paragraphs. */
+export function useFocusModeParagraphSpacing(): Settings['focusModeParagraphSpacing'] {
+  return useSelector(useSettingsService(), selectParagraphSpacing, isDeepEqual)
 }

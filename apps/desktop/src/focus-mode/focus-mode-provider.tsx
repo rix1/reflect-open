@@ -14,7 +14,10 @@ import { useAppServices, useCoreServices } from '@/services/services-provider.ts
 import { FocusModeStats } from './focus-mode-stats.tsx'
 import {
   useFocusModeFont,
+  useFocusModeFontSize,
   useFocusModeFullscreen,
+  useFocusModeLineWidth,
+  useFocusModeParagraphSpacing,
   useFocusModeTypewriter,
 } from './use-focus-mode-settings.ts'
 import './focus-mode.css'
@@ -96,12 +99,17 @@ function FocusModeFullscreen({ active }: { active: boolean }): null {
 }
 
 /**
- * Mirrors focus mode onto the document root (`data-focus-mode`, the
- * typewriter padding hook `data-focus-typewriter`, and the `--focus-mode-font`
- * the writing surface uses) so CSS can restyle every surface at once.
+ * Mirrors focus mode onto the document root so CSS (`focus-mode.css`) can
+ * restyle every surface at once: `data-focus-mode`, the typewriter padding
+ * hook `data-focus-typewriter`, `data-focus-paragraph-spacing`, and the
+ * typography variables `--focus-mode-font`, `--focus-mode-font-size` and
+ * `--focus-mode-line-width`.
  */
 function FocusModeRootAttributes({ active }: { active: boolean }): null {
   const font = useFocusModeFont()
+  const fontSize = useFocusModeFontSize()
+  const lineWidth = useFocusModeLineWidth()
+  const paragraphSpacing = useFocusModeParagraphSpacing()
   const typewriter = useFocusModeTypewriter()
 
   useEffect(() => {
@@ -110,6 +118,9 @@ function FocusModeRootAttributes({ active }: { active: boolean }): null {
     }
     const root = document.documentElement
     root.dataset['focusMode'] = 'true'
+    root.dataset['focusParagraphSpacing'] = paragraphSpacing
+    root.style.setProperty('--focus-mode-font-size', `${fontSize}px`)
+    root.style.setProperty('--focus-mode-line-width', String(lineWidth))
     if (typewriter) {
       root.dataset['focusTypewriter'] = 'true'
     }
@@ -119,9 +130,12 @@ function FocusModeRootAttributes({ active }: { active: boolean }): null {
     return () => {
       delete root.dataset['focusMode']
       delete root.dataset['focusTypewriter']
+      delete root.dataset['focusParagraphSpacing']
       root.style.removeProperty('--focus-mode-font')
+      root.style.removeProperty('--focus-mode-font-size')
+      root.style.removeProperty('--focus-mode-line-width')
     }
-  }, [active, font, typewriter])
+  }, [active, font, fontSize, lineWidth, paragraphSpacing, typewriter])
 
   return null
 }

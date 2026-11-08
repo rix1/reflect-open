@@ -289,8 +289,12 @@ export {
   focusModeDimSchema,
   focusModeFontSchema,
   focusModeStatSchema,
+  focusModeFontSizeSchema,
+  focusModeLineWidthSchema,
+  focusModeParagraphSpacingSchema,
   type FocusModeDim,
   type FocusModeStat,
+  type FocusModeParagraphSpacing,
 } from './settings/focus-mode-schema.ts'
 export { writingStats, type WritingStats } from './markdown/writing-stats.ts'
 export {

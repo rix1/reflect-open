@@ -58,6 +58,27 @@ export const focusModeStatSchema = z
 
 export type FocusModeStat = z.infer<typeof focusModeStatSchema>
 
+/**
+ * Focus mode's text size in CSS pixels, independent of the editor's own size.
+ * 17 by default, iA Writer's size on a Retina display.
+ */
+export const focusModeFontSizeSchema = z.number().int().min(12).max(28).catch(17)
+
+/**
+ * How wide focus mode's column is, in characters of a monospace font at the
+ * focus-mode size. 64 by default, iA Writer's line length.
+ */
+export const focusModeLineWidthSchema = z.number().int().min(40).max(100).catch(64)
+
+/**
+ * The space between paragraphs (and headings, quotes and lists, but not
+ * between the items of one list) in focus mode: a full blank line like iA
+ * Writer, half of one, or the editor's usual tight spacing.
+ */
+export const focusModeParagraphSpacingSchema = z.enum(['full', 'half', 'tight']).catch('full')
+
+export type FocusModeParagraphSpacing = z.infer<typeof focusModeParagraphSpacingSchema>
+
 /** The focus-mode keys of `settingsSchema`. */
 export const focusModeSettingsShape = {
   focusModeDim: focusModeDimSchema,
@@ -65,4 +86,7 @@ export const focusModeSettingsShape = {
   focusModeFullscreen: focusModeFullscreenSchema,
   focusModeFont: focusModeFontSchema,
   focusModeStat: focusModeStatSchema,
+  focusModeFontSize: focusModeFontSizeSchema,
+  focusModeLineWidth: focusModeLineWidthSchema,
+  focusModeParagraphSpacing: focusModeParagraphSpacingSchema,
 }

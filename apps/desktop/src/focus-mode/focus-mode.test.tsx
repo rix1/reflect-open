@@ -53,15 +53,19 @@ function SidebarToggle(): ReactElement {
 }
 
 const ESSAY = '# Essay\n\nA first sentence.\n'
+const SPACING = '# Spacing\n\nFirst paragraph.\n\nSecond paragraph.\n\n- one\n- two\n'
 
 function renderWorkspace(route: Route, settings?: Partial<Settings>) {
   const core = createTestCoreServices({
     database: createWasmTestDatabaseService(),
-    noteFile: createTestNoteFileService({ files: { 'notes/essay.md': ESSAY } }),
+    noteFile: createTestNoteFileService({
+      files: { 'notes/essay.md': ESSAY, 'notes/spacing.md': SPACING },
+    }),
   })
   onTestFinished(() => core.database.close())
   seedNotes(core.database, [
     { path: 'notes/essay.md', markdown: ESSAY },
+    { path: 'notes/spacing.md', markdown: SPACING },
     { path: 'notes/other.md', markdown: '# Other\n\nSee [[Essay]].\n' },
   ])
   return renderInApp(
@@ -185,6 +189,43 @@ describe('focus mode', () => {
     await view.getByRole('button', { name: 'Toggle focus mode' }).click()
     await view.getByText('A first sentence.').hover()
     await expect.element(grip).not.toBeVisible()
+  })
+
+  it('sets iA-like typography: 17px text, a blank line between paragraphs, tight lists', async () => {
+    const view = await renderWorkspace({ kind: 'note', path: 'notes/spacing.md' })
+    await expect.element(view.getByText('Second paragraph.')).toBeInTheDocument()
+    await view.getByRole('button', { name: 'Toggle focus mode' }).click()
+
+    const surface = document.querySelector<HTMLElement>('.reflect-note-surface')
+    if (surface === null) {
+      throw new Error('missing note surface')
+    }
+    await vi.waitFor(() => expect(getComputedStyle(surface).fontSize).toBe('17px'))
+    const lineHeight = Number.parseFloat(getComputedStyle(surface).lineHeight)
+
+    const top = (text: string): number => view.getByText(text).element().getBoundingClientRect().top
+    // A blank line between paragraphs: the next one starts two lines down.
+    expect(top('Second paragraph.') - top('First paragraph.')).toBeCloseTo(2 * lineHeight, -1)
+    // List items stay a line apart.
+    expect(top('two') - top('one')).toBeLessThan(1.6 * lineHeight)
+  })
+
+  it('applies the typography settings', async () => {
+    const view = await renderWorkspace(
+      { kind: 'note', path: 'notes/spacing.md' },
+      { focusModeFontSize: 15, focusModeParagraphSpacing: 'tight' },
+    )
+    await expect.element(view.getByText('Second paragraph.')).toBeInTheDocument()
+    await view.getByRole('button', { name: 'Toggle focus mode' }).click()
+
+    const surface = document.querySelector<HTMLElement>('.reflect-note-surface')
+    if (surface === null) {
+      throw new Error('missing note surface')
+    }
+    await vi.waitFor(() => expect(getComputedStyle(surface).fontSize).toBe('15px'))
+    const lineHeight = Number.parseFloat(getComputedStyle(surface).lineHeight)
+    const top = (text: string): number => view.getByText(text).element().getBoundingClientRect().top
+    expect(top('Second paragraph.') - top('First paragraph.')).toBeLessThan(1.6 * lineHeight)
   })
 
   it('shows the writing counter only while on', async () => {

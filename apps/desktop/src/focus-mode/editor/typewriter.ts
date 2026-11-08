@@ -8,6 +8,7 @@ import {
 } from '@prosekit/core'
 import { Plugin, PluginKey, type EditorState, type PluginView } from '@prosekit/pm/state'
 import type { EditorView } from '@prosekit/pm/view'
+import { smoothScrollBy } from './smooth-scroll.ts'
 
 /**
  * Focus mode's typewriter scrolling: the caret line stays at the vertical
@@ -107,8 +108,9 @@ function getVisibleRange(scroller: HTMLElement | 'window', doc: Document): Verti
 
 /**
  * Scroll so the caret line sits at the vertical center of the scroller's
- * visible area. Instant, never smooth: an animation would trail behind fast
- * typing. False when the caret has no measurable geometry.
+ * visible area, easing there (`smooth-scroll.ts` retargets a running
+ * animation, so it never trails behind fast typing). False when the caret
+ * has no measurable geometry.
  */
 function centerCaret(view: EditorView): boolean {
   if (!isTextSelection(view.state.selection)) {
@@ -122,9 +124,9 @@ function centerCaret(view: EditorView): boolean {
   const scroller = findScroller(view)
   const visible = getVisibleRange(scroller, doc)
   const delta = caret.top + caret.height / 2 - (visible.top + visible.bottom) / 2
-  if (Math.abs(delta) >= 1) {
-    const target = scroller === 'window' ? doc.defaultView : scroller
-    target?.scrollBy({ top: delta, behavior: 'instant' })
+  const element = scroller === 'window' ? doc.scrollingElement : scroller
+  if (element !== null && Math.abs(delta) >= 1) {
+    smoothScrollBy(element, delta)
   }
   return true
 }
