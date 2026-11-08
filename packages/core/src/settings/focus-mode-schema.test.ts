@@ -31,15 +31,16 @@ describe('focus-mode settings', () => {
 
   it('keeps typography settings in range and degrades the rest to iA-like defaults', () => {
     const parsed = settingsSchema.parse({
-      focusModeFontSize: 15,
+      focusModeTextSize: -2,
       focusModeLineWidth: 72,
       focusModeParagraphSpacing: 'half',
     })
-    expect(parsed.focusModeFontSize).toBe(15)
+    expect(parsed.focusModeTextSize).toBe(-2)
     expect(parsed.focusModeLineWidth).toBe(72)
     expect(parsed.focusModeParagraphSpacing).toBe('half')
-    expect(settingsSchema.parse({ focusModeFontSize: 99 }).focusModeFontSize).toBe(17)
-    expect(settingsSchema.parse({ focusModeFontSize: 16.5 }).focusModeFontSize).toBe(17)
+    expect(settingsSchema.parse({ focusModeTextSize: 10 }).focusModeTextSize).toBe(0)
+    expect(settingsSchema.parse({ focusModeTextSize: -5 }).focusModeTextSize).toBe(0)
+    expect(settingsSchema.parse({ focusModeTextSize: 1.5 }).focusModeTextSize).toBe(0)
     expect(settingsSchema.parse({ focusModeLineWidth: '64' }).focusModeLineWidth).toBe(64)
     expect(
       settingsSchema.parse({ focusModeParagraphSpacing: 'double' }).focusModeParagraphSpacing,

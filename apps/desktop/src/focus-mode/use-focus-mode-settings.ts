@@ -29,8 +29,8 @@ function selectStat(settings: Settings): Settings['focusModeStat'] {
   return settings.focusModeStat
 }
 
-function selectFontSize(settings: Settings): Settings['focusModeFontSize'] {
-  return settings.focusModeFontSize
+function selectTextSize(settings: Settings): Settings['focusModeTextSize'] {
+  return settings.focusModeTextSize
 }
 
 function selectLineWidth(settings: Settings): Settings['focusModeLineWidth'] {
@@ -66,9 +66,9 @@ export function useFocusModeStat(): Settings['focusModeStat'] {
   return useSelector(useSettingsService(), selectStat, isDeepEqual)
 }
 
-/** Focus mode's text size, in CSS pixels. */
-export function useFocusModeFontSize(): Settings['focusModeFontSize'] {
-  return useSelector(useSettingsService(), selectFontSize, isDeepEqual)
+/** Focus mode's text size, in steps from the default. */
+export function useFocusModeTextSize(): Settings['focusModeTextSize'] {
+  return useSelector(useSettingsService(), selectTextSize, isDeepEqual)
 }
 
 /** Focus mode's column width, in monospace characters. */

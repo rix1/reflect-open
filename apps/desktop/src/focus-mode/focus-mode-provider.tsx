@@ -14,7 +14,7 @@ import { useAppServices, useCoreServices } from '@/services/services-provider.ts
 import { FocusModeStats } from './focus-mode-stats.tsx'
 import {
   useFocusModeFont,
-  useFocusModeFontSize,
+  useFocusModeTextSize,
   useFocusModeFullscreen,
   useFocusModeLineWidth,
   useFocusModeParagraphSpacing,
@@ -102,12 +102,12 @@ function FocusModeFullscreen({ active }: { active: boolean }): null {
  * Mirrors focus mode onto the document root so CSS (`focus-mode.css`) can
  * restyle every surface at once: `data-focus-mode`, the typewriter padding
  * hook `data-focus-typewriter`, `data-focus-paragraph-spacing`, and the
- * typography variables `--focus-mode-font`, `--focus-mode-font-size` and
+ * typography variables `--focus-mode-font`, `--focus-mode-text-scale` and
  * `--focus-mode-line-width`.
  */
 function FocusModeRootAttributes({ active }: { active: boolean }): null {
   const font = useFocusModeFont()
-  const fontSize = useFocusModeFontSize()
+  const textSize = useFocusModeTextSize()
   const lineWidth = useFocusModeLineWidth()
   const paragraphSpacing = useFocusModeParagraphSpacing()
   const typewriter = useFocusModeTypewriter()
@@ -119,7 +119,8 @@ function FocusModeRootAttributes({ active }: { active: boolean }): null {
     const root = document.documentElement
     root.dataset['focusMode'] = 'true'
     root.dataset['focusParagraphSpacing'] = paragraphSpacing
-    root.style.setProperty('--focus-mode-font-size', `${fontSize}px`)
+    // Each step is a seventeenth of the base size: about 1px at the middle size.
+    root.style.setProperty('--focus-mode-text-scale', String((17 + textSize) / 17))
     root.style.setProperty('--focus-mode-line-width', String(lineWidth))
     if (typewriter) {
       root.dataset['focusTypewriter'] = 'true'
@@ -132,10 +133,10 @@ function FocusModeRootAttributes({ active }: { active: boolean }): null {
       delete root.dataset['focusTypewriter']
       delete root.dataset['focusParagraphSpacing']
       root.style.removeProperty('--focus-mode-font')
-      root.style.removeProperty('--focus-mode-font-size')
+      root.style.removeProperty('--focus-mode-text-scale')
       root.style.removeProperty('--focus-mode-line-width')
     }
-  }, [active, font, fontSize, lineWidth, paragraphSpacing, typewriter])
+  }, [active, font, textSize, lineWidth, paragraphSpacing, typewriter])
 
   return null
 }

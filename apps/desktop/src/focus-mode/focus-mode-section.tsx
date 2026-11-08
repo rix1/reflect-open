@@ -2,13 +2,15 @@ import { useState, type ReactElement } from 'react'
 import {
   focusModeDimSchema,
   focusModeFontSchema,
-  focusModeFontSizeSchema,
+  focusModeTextSizeSchema,
+  FOCUS_MODE_TEXT_SIZE_RANGE,
   focusModeLineWidthSchema,
   focusModeParagraphSpacingSchema,
   type FocusModeDim,
   type FocusModeParagraphSpacing,
 } from '@reflect/core'
 import { Input } from '@/components/ui/input.tsx'
+import { Slider } from '@/components/ui/slider.tsx'
 import {
   Select,
   SelectContent,
@@ -24,7 +26,7 @@ import { useSettingsService } from '@/providers/settings-provider.tsx'
 import {
   useFocusModeDim,
   useFocusModeFont,
-  useFocusModeFontSize,
+  useFocusModeTextSize,
   useFocusModeFullscreen,
   useFocusModeLineWidth,
   useFocusModeParagraphSpacing,
@@ -41,11 +43,6 @@ const DIM_OPTIONS: Option<FocusModeDim>[] = [
   { value: 'paragraph', label: 'Paragraph' },
   { value: 'off', label: 'Nothing' },
 ]
-
-const FONT_SIZE_OPTIONS: Option<number>[] = [14, 15, 16, 17, 18, 19, 20, 22].map((size) => ({
-  value: size,
-  label: `${size} px`,
-}))
 
 const LINE_WIDTH_OPTIONS: Option<number>[] = [56, 64, 72, 80].map((width) => ({
   value: width,
@@ -66,7 +63,6 @@ export function FocusModeSection(): ReactElement {
   const dim = useFocusModeDim()
   const typewriter = useFocusModeTypewriter()
   const fullscreen = useFocusModeFullscreen()
-  const fontSize = useFocusModeFontSize()
   const lineWidth = useFocusModeLineWidth()
   const paragraphSpacing = useFocusModeParagraphSpacing()
   const settingsService = useSettingsService()
@@ -84,16 +80,7 @@ export function FocusModeSection(): ReactElement {
         }}
       />
 
-      <FocusModeSelectField
-        legend="Text size"
-        description="How large focus mode sets the text, apart from the editor's size."
-        label="Focus mode text size"
-        value={fontSize}
-        options={FONT_SIZE_OPTIONS}
-        onChange={(value) => {
-          return settingsService.update({ focusModeFontSize: focusModeFontSizeSchema.parse(value) })
-        }}
-      />
+      <FocusModeTextSizeField />
 
       <FocusModeSelectField
         legend="Line width"
@@ -137,6 +124,58 @@ export function FocusModeSection(): ReactElement {
 
       <FocusModeFontField />
     </SettingsSection>
+  )
+}
+
+/** "Default" at 0, otherwise the signed step ("+2", "−1"). */
+function describeTextSize(step: number): string {
+  if (step === 0) {
+    return 'Default'
+  }
+  return step > 0 ? `+${step}` : `−${-step}`
+}
+
+/**
+ * Focus mode's text size, iA Writer style: a slider of steps around the
+ * default rather than a pixel size, since the base size follows the window
+ * width. Saved when the drag ends, not on every step.
+ */
+function FocusModeTextSizeField(): ReactElement {
+  const saved = useFocusModeTextSize()
+  const settingsService = useSettingsService()
+  const [draft, setDraft] = useState<number | null>(null)
+  const step = draft ?? saved
+
+  return (
+    <SettingsField
+      legend="Text size"
+      description="Focus mode's text grows with the window, like iA Writer. This scales it at every width."
+    >
+      <div className="mt-3 flex w-72 items-center gap-3">
+        <span aria-hidden className="text-xs text-text-muted">
+          A
+        </span>
+        <Slider
+          min={FOCUS_MODE_TEXT_SIZE_RANGE.min}
+          max={FOCUS_MODE_TEXT_SIZE_RANGE.max}
+          step={1}
+          value={step}
+          getAriaLabel={() => 'Focus mode text size'}
+          getAriaValueText={(_formatted, value) => describeTextSize(value)}
+          onValueChange={(value) => setDraft(value)}
+          onValueCommitted={(value) => {
+            settingsService.update({ focusModeTextSize: focusModeTextSizeSchema.parse(value) })
+            setDraft(null)
+          }}
+        />
+        <span aria-hidden className="text-lg text-text-muted">
+          A
+        </span>
+      </div>
+      <p className="mt-1 w-72 text-center text-xs text-text-muted tabular-nums">
+        {describeTextSize(step)}
+      </p>
+    </SettingsField>
   )
 }
 

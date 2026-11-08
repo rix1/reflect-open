@@ -59,10 +59,19 @@ export const focusModeStatSchema = z
 export type FocusModeStat = z.infer<typeof focusModeStatSchema>
 
 /**
- * Focus mode's text size in CSS pixels, independent of the editor's own size.
- * 17 by default, iA Writer's size on a Retina display.
+ * Focus mode's text size, as steps from the default. Like iA Writer, the
+ * base size follows the window width (15, 17 or 19px across three
+ * breakpoints, `focus-mode.css`) and each step scales all three by a
+ * seventeenth, about 1px at the middle size. -4 to +9, iA's slider range.
  */
-export const focusModeFontSizeSchema = z.number().int().min(12).max(28).catch(17)
+export const FOCUS_MODE_TEXT_SIZE_RANGE = { min: -4, max: 9 } as const
+
+export const focusModeTextSizeSchema = z
+  .number()
+  .int()
+  .min(FOCUS_MODE_TEXT_SIZE_RANGE.min)
+  .max(FOCUS_MODE_TEXT_SIZE_RANGE.max)
+  .catch(0)
 
 /**
  * How wide focus mode's column is, in characters of a monospace font at the
@@ -86,7 +95,7 @@ export const focusModeSettingsShape = {
   focusModeFullscreen: focusModeFullscreenSchema,
   focusModeFont: focusModeFontSchema,
   focusModeStat: focusModeStatSchema,
-  focusModeFontSize: focusModeFontSizeSchema,
+  focusModeTextSize: focusModeTextSizeSchema,
   focusModeLineWidth: focusModeLineWidthSchema,
   focusModeParagraphSpacing: focusModeParagraphSpacingSchema,
 }

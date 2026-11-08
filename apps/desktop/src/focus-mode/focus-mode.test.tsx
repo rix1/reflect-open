@@ -213,7 +213,7 @@ describe('focus mode', () => {
   it('applies the typography settings', async () => {
     const view = await renderWorkspace(
       { kind: 'note', path: 'notes/spacing.md' },
-      { focusModeFontSize: 15, focusModeParagraphSpacing: 'tight' },
+      { focusModeTextSize: -2, focusModeParagraphSpacing: 'tight' },
     )
     await expect.element(view.getByText('Second paragraph.')).toBeInTheDocument()
     await view.getByRole('button', { name: 'Toggle focus mode' }).click()
@@ -226,6 +226,25 @@ describe('focus mode', () => {
     const lineHeight = Number.parseFloat(getComputedStyle(surface).lineHeight)
     const top = (text: string): number => view.getByText(text).element().getBoundingClientRect().top
     expect(top('Second paragraph.') - top('First paragraph.')).toBeLessThan(1.6 * lineHeight)
+  })
+
+  it('grows the text with the window at three breakpoints, like iA Writer', async () => {
+    const view = await renderWorkspace({ kind: 'note', path: 'notes/spacing.md' })
+    await expect.element(view.getByText('Second paragraph.')).toBeInTheDocument()
+    await view.getByRole('button', { name: 'Toggle focus mode' }).click()
+    const surface = document.querySelector<HTMLElement>('.reflect-note-surface')
+    if (surface === null) {
+      throw new Error('missing note surface')
+    }
+
+    for (const [width, size] of [
+      [1000, '15px'],
+      [1280, '17px'],
+      [1500, '19px'],
+    ] as const) {
+      await page.viewport(width, 800)
+      await vi.waitFor(() => expect(getComputedStyle(surface).fontSize).toBe(size))
+    }
   })
 
   it('shows the writing counter only while on', async () => {

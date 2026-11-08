@@ -5,17 +5,32 @@
    purpose: these rules must beat meowdown's layered styles.
 
    The shell has already dropped the sidebars; these rules turn what is left
-   into a writing surface tuned like iA Writer: the user's font, size and line
-   length (defaults 17px and 64 characters, overriding full-width notes too),
-   a full blank line between paragraphs, and a daily stream where only the day
-   you are in is at full strength. */
+   into a writing surface tuned like iA Writer: the user's font, a text size
+   that grows with the window, a 64-character line (overriding full-width
+   notes too), a full blank line between paragraphs, and a daily stream
+   where only the day you are in is at full strength. */
 :root[data-focus-mode='true'] {
-  --focus-mode-size: var(--focus-mode-font-size, 17px);
+  /* Like iA Writer, the base size follows the window: 15px, 17px or 19px
+     (measured from iA at about 990, 1210 and 1570pt wide windows), so the
+     line keeps its character count as the window grows. The Text size
+     setting scales all three (`--focus-mode-text-scale`). */
+  --focus-mode-base-size: 15px;
+  --focus-mode-size: calc(var(--focus-mode-base-size) * var(--focus-mode-text-scale, 1));
   /* The column in characters of a monospace font (0.6em advance) at the
      focus size, computed once at the root so every gutter-aligned element
      (editor, day headers, alerts) shares the same edge. */
   --focus-mode-measure: calc(var(--focus-mode-line-width, 64) * 0.6 * var(--focus-mode-size));
   --editor-content-gutter: max(2rem, calc((100% - var(--focus-mode-measure)) / 2));
+}
+@media (min-width: 1100px) {
+  :root[data-focus-mode='true'] {
+    --focus-mode-base-size: 17px;
+  }
+}
+@media (min-width: 1400px) {
+  :root[data-focus-mode='true'] {
+    --focus-mode-base-size: 19px;
+  }
 }
 :root[data-focus-mode='true'] .reflect-note-surface {
   font-family: var(--focus-mode-font, var(--font-reading, var(--font-sans)));
