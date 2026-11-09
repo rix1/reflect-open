@@ -71,19 +71,25 @@ function NavigateButtons(): ReactElement {
 }
 
 const ESSAY = '# Essay\n\nA first sentence.\n'
+const HEADINGS = '# Headings\n\n## Section\n\n### Part\n\nBody text.\n'
 const SPACING = '# Spacing\n\nFirst paragraph.\n\nSecond paragraph.\n\n- one\n- two\n'
 
 function renderWorkspace(route: Route, settings?: Partial<Settings>) {
   const core = createTestCoreServices({
     database: createWasmTestDatabaseService(),
     noteFile: createTestNoteFileService({
-      files: { 'notes/essay.md': ESSAY, 'notes/spacing.md': SPACING },
+      files: {
+        'notes/essay.md': ESSAY,
+        'notes/spacing.md': SPACING,
+        'notes/headings.md': HEADINGS,
+      },
     }),
   })
   onTestFinished(() => core.database.close())
   seedNotes(core.database, [
     { path: 'notes/essay.md', markdown: ESSAY },
     { path: 'notes/spacing.md', markdown: SPACING },
+    { path: 'notes/headings.md', markdown: HEADINGS },
     { path: 'notes/other.md', markdown: '# Other\n\nSee [[Essay]].\n' },
   ])
   return renderInApp(
@@ -246,6 +252,32 @@ describe('focus mode', () => {
     expect(top('Second paragraph.') - top('First paragraph.')).toBeCloseTo(2 * lineHeight, -1)
     // List items stay a line apart.
     expect(top('two') - top('one')).toBeLessThan(1.6 * lineHeight)
+  })
+
+  it('sizes headings from the text size, heavier, at every breakpoint', async () => {
+    const view = await renderWorkspace({ kind: 'note', path: 'notes/headings.md' })
+    await expect.element(view.getByText('Body text.')).toBeInTheDocument()
+    await view.getByRole('button', { name: 'Toggle focus mode' }).click()
+
+    const style = (selector: string): CSSStyleDeclaration => {
+      const element = document.querySelector(`.reflect-note-surface ${selector}`)
+      if (element === null) {
+        throw new Error(`missing ${selector}`)
+      }
+      return getComputedStyle(element)
+    }
+    for (const [width, body] of [
+      [1000, 15],
+      [1280, 17],
+      [1500, 19],
+    ] as const) {
+      await page.viewport(width, 800)
+      await vi.waitFor(() => expect(style('h2').fontSize).toBe(`${body * 1.125}px`))
+      expect(style('h1').fontSize, `h1 at ${width}`).toBe(`${body * 1.25}px`)
+      expect(style('h3').fontSize, `h3 at ${width}`).toBe(`${body}px`)
+    }
+    expect(style('h1').fontWeight).toBe('750')
+    expect(style('h3').fontWeight).toBe('750')
   })
 
   it('applies the typography settings', async () => {
