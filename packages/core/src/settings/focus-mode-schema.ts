@@ -88,6 +88,18 @@ export const focusModeParagraphSpacingSchema = z.enum(['full', 'half', 'tight'])
 
 export type FocusModeParagraphSpacing = z.infer<typeof focusModeParagraphSpacingSchema>
 
+/**
+ * How focus mode shows markdown syntax, overriding the editor's own setting
+ * while it is on: always (like iA Writer), around the caret, never, or the
+ * same as the editor. The editor's setting itself is never changed, so
+ * leaving focus mode brings it straight back.
+ */
+export const focusModeMarkdownSyntaxSchema = z
+  .enum(['show', 'hybrid', 'hide', 'editor'])
+  .catch('show')
+
+export type FocusModeMarkdownSyntax = z.infer<typeof focusModeMarkdownSyntaxSchema>
+
 /** The focus-mode keys of `settingsSchema`. */
 export const focusModeSettingsShape = {
   focusModeDim: focusModeDimSchema,
@@ -98,4 +110,5 @@ export const focusModeSettingsShape = {
   focusModeTextSize: focusModeTextSizeSchema,
   focusModeLineWidth: focusModeLineWidthSchema,
   focusModeParagraphSpacing: focusModeParagraphSpacingSchema,
+  focusModeMarkdownSyntax: focusModeMarkdownSyntaxSchema,
 }

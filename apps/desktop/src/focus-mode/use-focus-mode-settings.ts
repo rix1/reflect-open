@@ -41,6 +41,10 @@ function selectParagraphSpacing(settings: Settings): Settings['focusModeParagrap
   return settings.focusModeParagraphSpacing
 }
 
+function selectMarkdownSyntax(settings: Settings): Settings['focusModeMarkdownSyntax'] {
+  return settings.focusModeMarkdownSyntax
+}
+
 /** What focus mode keeps at full strength: a sentence, a paragraph, or everything. */
 export function useFocusModeDim(): Settings['focusModeDim'] {
   return useSelector(useSettingsService(), selectDim, isDeepEqual)
@@ -79,4 +83,9 @@ export function useFocusModeLineWidth(): Settings['focusModeLineWidth'] {
 /** The space focus mode leaves between paragraphs. */
 export function useFocusModeParagraphSpacing(): Settings['focusModeParagraphSpacing'] {
   return useSelector(useSettingsService(), selectParagraphSpacing, isDeepEqual)
+}
+
+/** How focus mode shows markdown syntax (`editor` defers to the editor setting). */
+export function useFocusModeMarkdownSyntax(): Settings['focusModeMarkdownSyntax'] {
+  return useSelector(useSettingsService(), selectMarkdownSyntax, isDeepEqual)
 }

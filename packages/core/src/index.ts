@@ -299,7 +299,9 @@ export {
   FOCUS_MODE_TEXT_SIZE_RANGE,
   focusModeLineWidthSchema,
   focusModeParagraphSpacingSchema,
+  focusModeMarkdownSyntaxSchema,
   type FocusModeDim,
+  type FocusModeMarkdownSyntax,
   type FocusModeStat,
   type FocusModeParagraphSpacing,
 } from './settings/focus-mode-schema.ts'

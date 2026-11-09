@@ -6,7 +6,9 @@ import {
   FOCUS_MODE_TEXT_SIZE_RANGE,
   focusModeLineWidthSchema,
   focusModeParagraphSpacingSchema,
+  focusModeMarkdownSyntaxSchema,
   type FocusModeDim,
+  type FocusModeMarkdownSyntax,
   type FocusModeParagraphSpacing,
 } from '@reflect/core'
 import { Input } from '@/components/ui/input.tsx'
@@ -29,6 +31,7 @@ import {
   useFocusModeTextSize,
   useFocusModeFullscreen,
   useFocusModeLineWidth,
+  useFocusModeMarkdownSyntax,
   useFocusModeParagraphSpacing,
   useFocusModeTypewriter,
 } from './use-focus-mode-settings.ts'
@@ -55,6 +58,13 @@ const PARAGRAPH_SPACING_OPTIONS: Option<FocusModeParagraphSpacing>[] = [
   { value: 'tight', label: 'Tight' },
 ]
 
+const MARKDOWN_SYNTAX_OPTIONS: Option<FocusModeMarkdownSyntax>[] = [
+  { value: 'show', label: 'Show' },
+  { value: 'hybrid', label: 'Hybrid' },
+  { value: 'hide', label: 'Hide' },
+  { value: 'editor', label: 'Same as editor' },
+]
+
 /**
  * How focus mode (⌘⇧F) behaves. The mode itself is toggled from the keyboard,
  * the View menu or the palette; these settings shape what it does.
@@ -65,6 +75,7 @@ export function FocusModeSection(): ReactElement {
   const fullscreen = useFocusModeFullscreen()
   const lineWidth = useFocusModeLineWidth()
   const paragraphSpacing = useFocusModeParagraphSpacing()
+  const markdownSyntax = useFocusModeMarkdownSyntax()
   const settingsService = useSettingsService()
 
   return (
@@ -104,6 +115,19 @@ export function FocusModeSection(): ReactElement {
         onChange={(value) => {
           return settingsService.update({
             focusModeParagraphSpacing: focusModeParagraphSpacingSchema.parse(value),
+          })
+        }}
+      />
+
+      <FocusModeSelectField
+        legend="Markdown syntax"
+        description="Show the markdown marks while focus mode is on. Your editor setting comes back when you leave."
+        label="Focus mode markdown syntax"
+        value={markdownSyntax}
+        options={MARKDOWN_SYNTAX_OPTIONS}
+        onChange={(value) => {
+          return settingsService.update({
+            focusModeMarkdownSyntax: focusModeMarkdownSyntaxSchema.parse(value),
           })
         }}
       />

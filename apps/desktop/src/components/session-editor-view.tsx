@@ -5,6 +5,7 @@ import { NoteSaveAlerts } from '@/components/note-save-alerts.tsx'
 import { SuggestedContactCard } from '@/components/suggested-contact-card.tsx'
 import { EditorAiKeymap } from '@/editor/ai-menu/editor-ai-keymap.tsx'
 import { FocusModeNoteExtensions } from '@/focus-mode/editor/focus-mode-note-extensions.tsx'
+import { useMarkdownSyntaxInFocusMode } from '@/focus-mode/use-markdown-syntax-in-focus-mode.ts'
 import { useEditorAiMenu } from '@/editor/ai-menu/use-editor-ai-menu.tsx'
 import { editorBodyWithDefaultBullet } from '@/editor/default-bullet.ts'
 import {
@@ -85,7 +86,7 @@ export function SessionEditorView({
   const graph = useGraphInfo()
   const dateFormat = useDateFormat()
   const timeFormat = useTimeFormat()
-  const editorMarkdownSyntax = useEditorMarkdownSyntax()
+  const editorMarkdownSyntax = useMarkdownSyntaxInFocusMode(useEditorMarkdownSyntax())
   const editorSpellCheck = useEditorSpellCheck()
   const editorSmoothCaretAnimation = useEditorSmoothCaretAnimation()
   const editorDefaultBullet = useEditorDefaultBullet()

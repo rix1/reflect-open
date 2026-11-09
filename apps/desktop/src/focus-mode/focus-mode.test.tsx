@@ -280,6 +280,31 @@ describe('focus mode', () => {
     expect(style('h3').fontWeight).toBe('750')
   })
 
+  it('shows markdown syntax while on, and gives the editor setting back after', async () => {
+    const view = await renderWorkspace(
+      { kind: 'note', path: 'notes/essay.md' },
+      { editorMarkdownSyntax: 'hide' },
+    )
+    const editor = page.locate('.ProseMirror')
+    await expect.element(editor).toHaveAttribute('data-mark-mode', 'hide')
+    const focusToggle = view.getByRole('button', { name: 'Toggle focus mode' })
+
+    await focusToggle.click()
+    await expect.element(editor).toHaveAttribute('data-mark-mode', 'show')
+
+    await focusToggle.click()
+    await expect.element(editor).toHaveAttribute('data-mark-mode', 'hide')
+  })
+
+  it('follows the editor setting when focus mode says so', async () => {
+    const view = await renderWorkspace(
+      { kind: 'note', path: 'notes/essay.md' },
+      { editorMarkdownSyntax: 'hybrid', focusModeMarkdownSyntax: 'editor' },
+    )
+    await view.getByRole('button', { name: 'Toggle focus mode' }).click()
+    await expect.element(page.locate('.ProseMirror')).toHaveAttribute('data-mark-mode', 'focus')
+  })
+
   it('applies the typography settings', async () => {
     const view = await renderWorkspace(
       { kind: 'note', path: 'notes/spacing.md' },
