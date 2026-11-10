@@ -85,5 +85,11 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: 'Press ⌘⇧F to hide everything but the note, fade all but the sentence you are writing, and keep your line in the middle of the screen, with a live word count in the corner. Tune it in Settings → Focus mode.',
       platforms: ['darwin', 'windows', 'linux'],
     },
+    {
+      id: 'code-block-language-shortcut',
+      title: 'Code block languages from the keyboard',
+      body: 'With the caret in a code block, press ⌘P to pick its language, then carry on typing where you were.',
+      platforms: ['darwin', 'windows', 'linux'],
+    },
   ],
 }
