@@ -1,4 +1,4 @@
-import { memo, useState, type ReactElement } from 'react'
+import { memo, useRef, useState, type ReactElement } from 'react'
 import { deferredCreationPolicy, isDaily } from '@reflect/core'
 import { BacklinksPanel } from '@/components/backlinks-panel.tsx'
 import { NoteLoading } from '@/components/note-loading.tsx'
@@ -105,6 +105,7 @@ export function NotePaneComponent({
   onExitBoundary,
 }: NotePaneProps): ReactElement {
   const { noteCreation } = useCoreServices()
+  const paneRef = useRef<HTMLDivElement>(null)
   const dailyNote = isDaily(path)
   const policy = deferredCreationPolicy(path)
   const lazyCreate = lazy && policy.lazyCreatable
@@ -166,7 +167,7 @@ export function NotePaneComponent({
   }
 
   return (
-    <div className={cn('relative', className)} aria-label={`Editing ${path}`}>
+    <div ref={paneRef} className={cn('relative', className)} aria-label={`Editing ${path}`}>
       <SessionEditorView
         // Keyed on the session, not the path: a rename retargets the live
         // session under a new filename (Plan 17), and remounting the editor
@@ -181,6 +182,7 @@ export function NotePaneComponent({
         autoFocus={autoFocus}
         autoFocusSelection={autoFocusSelection}
         onAutoFocused={onAutoFocused}
+        paneRef={paneRef}
         gutterClassName={gutterClassName}
         editorClassName={editorClassName}
         dailyDate={dailyDate}

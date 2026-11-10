@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, type ReactElement } from 'react'
+import { useCallback, useMemo, useRef, type ReactElement, type RefObject } from 'react'
 import type { ExitBoundaryHandler, SearchStatus } from '@meowdown/core'
 import type { NoteSession } from '@reflect/core'
 import { NoteSaveAlerts } from '@/components/note-save-alerts.tsx'
@@ -8,6 +8,7 @@ import { FocusModeNoteExtensions } from '@/focus-mode/editor/focus-mode-note-ext
 import { useMarkdownSyntaxInFocusMode } from '@/focus-mode/use-markdown-syntax-in-focus-mode.ts'
 import { useEditorAiMenu } from '@/editor/ai-menu/use-editor-ai-menu.tsx'
 import { editorBodyWithDefaultBullet } from '@/editor/default-bullet.ts'
+import { focusEditorWhenShown } from '@/editor/focus-editor-when-shown.ts'
 import {
   registerNoteEditorHandle,
   unregisterNoteEditorHandle,
@@ -53,6 +54,8 @@ interface SessionEditorViewProps {
   autoFocus: boolean
   autoFocusSelection: 'start' | 'end'
   onAutoFocused: (() => void) | undefined
+  /** The pane around this view: autofocus has landed once focus is inside it. */
+  paneRef: RefObject<HTMLElement | null>
   /** Classes for the chrome around the editor (alerts, cards). */
   gutterClassName: string | undefined
   /** Classes for the contenteditable root. */
@@ -77,6 +80,7 @@ export function SessionEditorView({
   autoFocus,
   autoFocusSelection,
   onAutoFocused,
+  paneRef,
   gutterClassName,
   editorClassName,
   dailyDate,
@@ -140,17 +144,22 @@ export function SessionEditorView({
       if (dailyDate !== undefined) {
         registerHandle?.(dailyDate, handle)
       }
-      if (autoFocus) {
-        // By default the caret lands at the document start — for a seeded
-        // new note that is the empty H1, so typing names the note. An `end`
-        // selection moves it (and the scroll) to the note's content end.
-        handle.focus()
-        if (autoFocusSelection === 'end') {
-          handle.setSelection('end')
-        }
-        onAutoFocused?.()
-      }
+      // By default the caret lands at the document start — for a seeded new
+      // note that is the empty H1, so typing names the note. The request is
+      // consumed only once the attempt is over: a daily-stream row can still
+      // be hidden (unmeasured) when its editor mounts.
+      const cancelAutoFocus = autoFocus
+        ? focusEditorWhenShown(
+            handle,
+            autoFocusSelection,
+            () => paneRef.current,
+            () => {
+              onAutoFocused?.()
+            },
+          )
+        : undefined
       return () => {
+        cancelAutoFocus?.()
         // Runs while the handle is still live, so the session can still read
         // the editor's last input.
         session.attachEditor(null)
@@ -161,7 +170,16 @@ export function SessionEditorView({
         }
       }
     },
-    [session, path, dailyDate, registerHandle, autoFocus, autoFocusSelection, onAutoFocused],
+    [
+      session,
+      path,
+      dailyDate,
+      registerHandle,
+      autoFocus,
+      autoFocusSelection,
+      onAutoFocused,
+      paneRef,
+    ],
   )
   const onChange = useCallback((markdown: string) => session.editorChanged(markdown), [session])
 

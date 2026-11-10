@@ -97,5 +97,11 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: 'Press ⌘6–⌘9 to open your first four pinned notes, and hold ⌘ to see the shortcut beside every sidebar item.',
       platforms: ['darwin', 'windows', 'linux'],
     },
+    {
+      id: 'today-caret-end',
+      title: '⌘D puts you at the end of today',
+      body: 'Go to today with ⌘D and the caret waits at the end of today’s note, ready to type.',
+      platforms: ['darwin', 'windows', 'linux'],
+    },
   ],
 }

@@ -220,12 +220,18 @@ export function DailyStream({ target }: DailyStreamProps): ReactElement {
       return
     }
     pendingFocusRef.current = null
-    focusPendingRef.current = {
-      date: target,
-      selection: arrivalFocusEditorRef.current ? 'end' : 'start',
-    }
+    const selection = arrivalFocusEditorRef.current ? 'end' : 'start'
     virtualizerRef.current?.scrollToIndex(indexOfDate(dayWindow, target), { align: 'start' })
-  }, [arrivalSeq, entryId, dayWindow, savedScroll])
+    // The day's editor is already mounted (⌘D while on today): no row mounts
+    // to pick up a pending slot, so focus it now.
+    const mounted = dayHandlesRef.current.get(target)
+    if (mounted) {
+      focusPendingRef.current = null
+      focusDay(mounted, selection)
+      return
+    }
+    focusPendingRef.current = { date: target, selection }
+  }, [arrivalSeq, entryId, dayWindow, savedScroll, focusDay])
 
   // Save the day at the viewport top and how far into it the viewport starts.
   const saveDayScroll = useCallback(
