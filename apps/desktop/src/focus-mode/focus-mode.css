@@ -1,0 +1,137 @@
+/* Focus mode (⌘⇧F). Imported by `focus-mode-provider.tsx`, which sets
+   `data-focus-mode`, `data-focus-typewriter`, `data-focus-paragraph-spacing`
+   and the `--focus-mode-*` typography variables on the root. Kept out of
+   `styles/index.css` so the feature stays in its own folder. Un-layered on
+   purpose: these rules must beat meowdown's layered styles.
+
+   The shell has already dropped the sidebars; these rules turn what is left
+   into a writing surface tuned like iA Writer: the user's font, a text size
+   that grows with the window, a 64-character line (overriding full-width
+   notes too), a full blank line between paragraphs, and a daily stream
+   where only the day you are in is at full strength. */
+:root[data-focus-mode='true'] {
+  /* Like iA Writer, the base size follows the window: 15px, 17px or 19px
+     (measured from iA at about 990, 1210 and 1570pt wide windows), so the
+     line keeps its character count as the window grows. The Text size
+     setting scales all three (`--focus-mode-text-scale`). */
+  --focus-mode-base-size: 15px;
+  --focus-mode-size: calc(var(--focus-mode-base-size) * var(--focus-mode-text-scale, 1));
+  /* The column in characters of a monospace font (0.6em advance) at the
+     focus size, computed once at the root so every gutter-aligned element
+     (editor, day headers, alerts) shares the same edge. */
+  --focus-mode-measure: calc(var(--focus-mode-line-width, 64) * 0.6 * var(--focus-mode-size));
+  --editor-content-gutter: max(2rem, calc((100% - var(--focus-mode-measure)) / 2));
+}
+@media (min-width: 1100px) {
+  :root[data-focus-mode='true'] {
+    --focus-mode-base-size: 17px;
+  }
+}
+@media (min-width: 1400px) {
+  :root[data-focus-mode='true'] {
+    --focus-mode-base-size: 19px;
+  }
+}
+:root[data-focus-mode='true'] .reflect-note-surface {
+  font-family: var(--focus-mode-font, var(--font-reading, var(--font-sans)));
+  font-size: var(--focus-mode-size);
+  line-height: 1.65;
+}
+
+/* Headings are sized from the focus size, so they grow with the window and
+   the Text size setting like the body: H3 (and below) at text size, then
+   even steps up (a ratio reads as even, a fixed difference does not), with
+   a slightly bigger one to H1. All heavy. The ems resolve where meowdown
+   reads the variables, against the surface's size. */
+:root[data-focus-mode='true'] .reflect-note-surface {
+  --meowdown-h1-size: 1.35em;
+  --meowdown-h2-size: 1.15em;
+  --meowdown-h3-size: 1em;
+  --meowdown-h4-size: 1em;
+  --meowdown-h5-size: 1em;
+  --meowdown-h6-size: 1em;
+
+  & :is(h1, h2, h3, h4, h5, h6) {
+    font-weight: 750;
+  }
+  & .reflect-note-title {
+    font-size: var(--meowdown-h1-size);
+  }
+}
+/* The daily date heading sits outside the editor: same size and weight as
+   an H1 there. */
+:root[data-focus-mode='true'] .reflect-daily-subject {
+  font-family: var(--focus-mode-font, var(--font-reading, var(--font-sans)));
+  font-size: calc(1.35 * var(--focus-mode-size));
+  font-weight: 750;
+}
+/* A focus font installed without a bold face (only Regular and Italic) gets
+   a synthesized bold, which WebKit draws barely heavier than the text. A
+   thin outline thickens it to a heading weight. The provider sets the flag
+   after looking for the font's heavy faces (`font-heavy-face.ts`). */
+:root[data-focus-mode='true'][data-focus-faux-bold='true']
+  :is(.reflect-note-surface :is(h1, h2, h3, h4, h5, h6), .reflect-daily-subject) {
+  -webkit-text-stroke: 0.03em currentColor;
+}
+
+/* Paragraph spacing. Meowdown spaces blocks with a little padding each;
+   focus mode adds a gap between top-level blocks so paragraphs read as
+   separated by a blank line, as in iA Writer. Consecutive list items are
+   top-level blocks too (flat lists), so the gap skips a list item that
+   follows another one: a list stays together. */
+:root[data-focus-paragraph-spacing='full'] .reflect-note-surface {
+  --focus-mode-block-gap: calc(1lh - 2 * var(--meowdown-block-padding, 0.3em));
+}
+:root[data-focus-paragraph-spacing='half'] .reflect-note-surface {
+  --focus-mode-block-gap: calc(0.5lh - 2 * var(--meowdown-block-padding, 0.3em));
+}
+:root[data-focus-mode='true'] .reflect-note-surface {
+  & > * + :not(.prosemirror-flat-list),
+  & > :not(.prosemirror-flat-list) + .prosemirror-flat-list {
+    margin-block-start: max(0px, var(--focus-mode-block-gap, 0px));
+  }
+}
+:root[data-focus-mode='true'] .reflect-daily-day {
+  border-bottom-color: transparent;
+  transition: opacity 200ms ease;
+}
+:root[data-focus-mode='true'] .reflect-daily-day:not(:focus-within) {
+  opacity: 0.35;
+}
+:root[data-focus-mode='true'] .reflect-daily-subject {
+  color: var(--text-muted);
+}
+/* meowdown keeps every editor's current block lit, focused or not; in the
+   stream only the day you are writing in should have one. */
+:root[data-focus-mode='true']
+  .reflect-daily-day
+  .ProseMirror[data-focus-dim]:not(.ProseMirror-focused)
+  :is(.reflect-focus-current, .reflect-focus-current *) {
+  color: var(--focus-dim-color);
+}
+
+/* Typewriter scrolling centers the caret line, so the first and last lines
+   need room above and below them to reach the middle of the window. A single
+   note gets it inside its editor; the daily stream only needs it after the
+   last day. */
+:root[data-focus-typewriter='true'] .reflect-note-surface {
+  padding-block: 40vh 50vh;
+}
+:root[data-focus-typewriter='true'] .reflect-daily-day .reflect-note-surface {
+  padding-block: 0;
+}
+:root[data-focus-typewriter='true'] .reflect-daily-tail {
+  height: 50vh;
+}
+
+/* Focus mode leaves only the writing. These hooks are upstream's own stable
+   names (the regions' accessible names and meowdown's block-handle test id),
+   so the note pane needs no focus-mode branches; `focus-mode.test.tsx` fails
+   if one of them is renamed. */
+:root[data-focus-mode='true'] {
+  [aria-label='Incoming backlinks'],
+  [aria-label='Suggested contact'],
+  [data-testid='block-handle'] {
+    display: none;
+  }
+}

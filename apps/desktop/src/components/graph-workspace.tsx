@@ -4,6 +4,7 @@ import { PaletteProvider } from '@/components/command-palette/palette-provider.t
 import { NoteWindowContent } from '@/components/note-window-content.tsx'
 import { WhatsNewDialog } from '@/components/whats-new/whats-new-dialog.tsx'
 import { WorkspaceContent } from '@/components/workspace-content.tsx'
+import { FocusModeProvider } from '@/focus-mode/focus-mode-provider.tsx'
 import { AudioMemoProvider } from '@/providers/audio-memo-provider.tsx'
 import { FocusedDailyProvider } from '@/providers/focused-daily-provider.tsx'
 import { DeepLinkProvider } from '@/providers/deep-link-provider.tsx'
@@ -55,7 +56,9 @@ export function GraphWorkspace({ graph }: GraphWorkspaceProps): ReactElement {
                           import's single face. */}
                       {appWindow.isMainWindow() ? (
                         <V1ImportProvider>
-                          <WorkspaceContent graph={graph} />
+                          <FocusModeProvider>
+                            <WorkspaceContent graph={graph} />
+                          </FocusModeProvider>
                           <WhatsNewDialog />
                         </V1ImportProvider>
                       ) : (

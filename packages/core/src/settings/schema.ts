@@ -2,6 +2,7 @@ import { getWeekStart, type Weekday } from '@reflect/utils'
 import { z } from 'zod'
 import { TEXT_CAPTURE_PARENT_MAX_LENGTH } from '../capture/text-capture-limits.ts'
 import { isHttpBaseUrl, normalizeOpenAICompatibleBaseUrl } from '../lib/http-url.ts'
+import { focusModeSettingsShape } from './focus-mode-schema.ts'
 
 /**
  * The user-settings schema — the policy half of the settings store. Rust
@@ -552,6 +553,7 @@ export const settingsSchema = z.looseObject({
   editorSmoothCaretAnimation: editorSmoothCaretAnimationSchema,
   editorTextSize: editorTextSizeSchema,
   editorFullWidth: editorFullWidthSchema,
+  ...focusModeSettingsShape,
   sidebarWidth: sidebarWidthSchema,
   contextSidebarWidth: contextSidebarWidthSchema,
   semanticSearchEnabled: semanticSearchEnabledSchema,

@@ -57,6 +57,11 @@ export interface WindowHost {
   listen(event: string, handler: (payload: unknown) => void): MaybePromise<Unlisten>
   onCloseRequested(handler: CloseRequestedHandler): MaybePromise<Unlisten>
   hide(): MaybePromise<void>
+  /**
+   * Whether this window is in native full screen.
+   */
+  isFullscreen(): MaybePromise<boolean>
+  setFullscreen(fullscreen: boolean): MaybePromise<void>
 }
 
 /**
@@ -99,6 +104,16 @@ export interface WindowService {
   emitTo(label: string, event: string, payload: unknown): MaybePromise<void>
   onCloseRequested(handler: CloseRequestedHandler): Unlisten
   hide(): MaybePromise<void>
+  /**
+   * Whether this window is in native full screen. False where the host has
+   * no native windows.
+   */
+  isFullscreen(): MaybePromise<boolean>
+  /**
+   * Enter or leave native full screen. A no-op where the host has no native
+   * windows.
+   */
+  setFullscreen(fullscreen: boolean): MaybePromise<void>
   /**
    * Open or close the native web inspector of this window.
    */
@@ -206,6 +221,14 @@ class WindowServiceImpl implements WindowService {
     return this.#deps.host.hide()
   }
 
+  isFullscreen(): MaybePromise<boolean> {
+    return this.#deps.host.isFullscreen()
+  }
+
+  setFullscreen(fullscreen: boolean): MaybePromise<void> {
+    return this.#deps.host.setFullscreen(fullscreen)
+  }
+
   async toggleDevtools(): Promise<void> {
     await this.#deps.ipc.call('toggle_devtools', {}, z.null())
   }
@@ -257,6 +280,12 @@ class SingleWindowHostImpl implements WindowHost {
   }
 
   hide(): void {}
+
+  isFullscreen(): boolean {
+    return false
+  }
+
+  setFullscreen(_fullscreen: boolean): void {}
 }
 
 /**

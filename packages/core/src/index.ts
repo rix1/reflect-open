@@ -292,6 +292,21 @@ export {
 } from './settings/schema.ts'
 export { type SettingsLoadOutcome, type SettingsService } from './settings/settings-service.ts'
 export {
+  focusModeDimSchema,
+  focusModeFontSchema,
+  focusModeStatSchema,
+  focusModeTextSizeSchema,
+  FOCUS_MODE_TEXT_SIZE_RANGE,
+  focusModeLineWidthSchema,
+  focusModeParagraphSpacingSchema,
+  focusModeMarkdownSyntaxSchema,
+  type FocusModeDim,
+  type FocusModeMarkdownSyntax,
+  type FocusModeStat,
+  type FocusModeParagraphSpacing,
+} from './settings/focus-mode-schema.ts'
+export { writingStats, type WritingStats } from './markdown/writing-stats.ts'
+export {
   formatDayLabel,
   formatFullDate,
   formatMonthDay,

@@ -44,7 +44,7 @@ export function isTagName(value: string): boolean {
 }
 
 /** Names whose source range is markup to drop from plain text. */
-function isSyntaxNode(name: string): boolean {
+export function isSyntaxNode(name: string): boolean {
   return name.endsWith('Mark') || name === 'URL' || name === 'CodeInfo' || name === 'TaskMarker'
 }
 
@@ -59,7 +59,7 @@ function isTagExcludedNode(name: string): boolean {
   )
 }
 
-function isLiteralPlainTextNode(name: string): boolean {
+export function isLiteralPlainTextNode(name: string): boolean {
   return name === 'InlineCode' || name === 'FencedCode' || name === 'CodeBlock'
 }
 
