@@ -12,6 +12,7 @@ import {
 } from 'react'
 import { useRouterState } from '@/routing/router.tsx'
 import { useAppServices, useCoreServices } from '@/services/services-provider.tsx'
+import { fontHasHeavyFace } from './font-heavy-face.ts'
 import { FocusModeStats } from './focus-mode-stats.tsx'
 import {
   useFocusModeFont,
@@ -119,7 +120,8 @@ function FocusModeFullscreen({ active }: { active: boolean }): null {
  * restyle every surface at once: `data-focus-mode`, the typewriter padding
  * hook `data-focus-typewriter`, `data-focus-paragraph-spacing`, and the
  * typography variables `--focus-mode-font`, `--focus-mode-text-scale` and
- * `--focus-mode-line-width`.
+ * `--focus-mode-line-width`, and `data-focus-faux-bold` when the focus font
+ * has no bold face of its own.
  */
 function FocusModeRootAttributes({ active }: { active: boolean }): null {
   const font = useFocusModeFont()
@@ -153,6 +155,24 @@ function FocusModeRootAttributes({ active }: { active: boolean }): null {
       root.style.removeProperty('--focus-mode-line-width')
     }
   }, [active, font, textSize, lineWidth, paragraphSpacing, typewriter])
+
+  // `data-focus-faux-bold`: the focus font has no heavy face for headings.
+  useEffect(() => {
+    if (!active || font === '') {
+      return
+    }
+    const root = document.documentElement
+    let current = true
+    void fontHasHeavyFace(font).then((hasHeavyFace) => {
+      if (current && !hasHeavyFace) {
+        root.dataset['focusFauxBold'] = 'true'
+      }
+    })
+    return () => {
+      current = false
+      delete root.dataset['focusFauxBold']
+    }
+  }, [active, font])
 
   return null
 }

@@ -38,14 +38,14 @@
   line-height: 1.65;
 }
 
-/* Headings keep the editor's ramp (H1 a quarter bigger than the text, H2 an
-   eighth, the rest at text size) but measure it from the focus size, so they
-   grow with the window and the Text size setting like the body. A heavier
-   weight carries the hierarchy the small size steps leave out. The ems
-   resolve where meowdown reads the variables, against the surface's size. */
+/* Headings are sized from the focus size, so they grow with the window and
+   the Text size setting like the body: H3 (and below) at text size, then
+   even steps up (a ratio reads as even, a fixed difference does not), with
+   a slightly bigger one to H1. All heavy. The ems resolve where meowdown
+   reads the variables, against the surface's size. */
 :root[data-focus-mode='true'] .reflect-note-surface {
-  --meowdown-h1-size: 1.25em;
-  --meowdown-h2-size: 1.125em;
+  --meowdown-h1-size: 1.35em;
+  --meowdown-h2-size: 1.15em;
   --meowdown-h3-size: 1em;
   --meowdown-h4-size: 1em;
   --meowdown-h5-size: 1em;
@@ -62,8 +62,16 @@
    an H1 there. */
 :root[data-focus-mode='true'] .reflect-daily-subject {
   font-family: var(--focus-mode-font, var(--font-reading, var(--font-sans)));
-  font-size: calc(1.25 * var(--focus-mode-size));
+  font-size: calc(1.35 * var(--focus-mode-size));
   font-weight: 750;
+}
+/* A focus font installed without a bold face (only Regular and Italic) gets
+   a synthesized bold, which WebKit draws barely heavier than the text. A
+   thin outline thickens it to a heading weight. The provider sets the flag
+   after looking for the font's heavy faces (`font-heavy-face.ts`). */
+:root[data-focus-mode='true'][data-focus-faux-bold='true']
+  :is(.reflect-note-surface :is(h1, h2, h3, h4, h5, h6), .reflect-daily-subject) {
+  -webkit-text-stroke: 0.03em currentColor;
 }
 
 /* Paragraph spacing. Meowdown spaces blocks with a little padding each;

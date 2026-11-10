@@ -272,9 +272,10 @@ describe('focus mode', () => {
       [1500, 19],
     ] as const) {
       await page.viewport(width, 800)
-      await vi.waitFor(() => expect(style('h2').fontSize).toBe(`${body * 1.125}px`))
-      expect(style('h1').fontSize, `h1 at ${width}`).toBe(`${body * 1.25}px`)
-      expect(style('h3').fontSize, `h3 at ${width}`).toBe(`${body}px`)
+      const px = (selector: string): number => Number.parseFloat(style(selector).fontSize)
+      await vi.waitFor(() => expect(px('h2')).toBeCloseTo(body * 1.15, 1))
+      expect(px('h1'), `h1 at ${width}`).toBeCloseTo(body * 1.35, 1)
+      expect(px('h3'), `h3 at ${width}`).toBeCloseTo(body, 1)
     }
     expect(style('h1').fontWeight).toBe('750')
     expect(style('h3').fontWeight).toBe('750')
@@ -303,6 +304,32 @@ describe('focus mode', () => {
     )
     await view.getByRole('button', { name: 'Toggle focus mode' }).click()
     await expect.element(page.locate('.ProseMirror')).toHaveAttribute('data-mark-mode', 'focus')
+  })
+
+  it('thickens headings when the focus font has no bold face', async () => {
+    const view = await renderWorkspace(
+      { kind: 'note', path: 'notes/headings.md' },
+      { focusModeFont: 'No Such Font Mono' },
+    )
+    await expect.element(view.getByText('Body text.')).toBeInTheDocument()
+    const focusToggle = view.getByRole('button', { name: 'Toggle focus mode' })
+    await focusToggle.click()
+
+    await expect.poll(() => document.documentElement.dataset['focusFauxBold']).toBe('true')
+    const h2 = document.querySelector('.reflect-note-surface h2')
+    expect(h2).not.toBeNull()
+    expect(getComputedStyle(h2!).webkitTextStrokeWidth).not.toBe('0px')
+
+    await focusToggle.click()
+    expect(document.documentElement.dataset['focusFauxBold']).toBeUndefined()
+  })
+
+  it('leaves headings alone in the editor font', async () => {
+    const view = await renderWorkspace({ kind: 'note', path: 'notes/headings.md' })
+    await expect.element(view.getByText('Body text.')).toBeInTheDocument()
+    await view.getByRole('button', { name: 'Toggle focus mode' }).click()
+    await expect.poll(() => document.documentElement.dataset['focusMode']).toBe('true')
+    expect(document.documentElement.dataset['focusFauxBold']).toBeUndefined()
   })
 
   it('applies the typography settings', async () => {
