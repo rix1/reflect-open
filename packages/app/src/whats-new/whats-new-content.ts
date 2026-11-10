@@ -91,5 +91,11 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: 'With the caret in a code block, press ⌘P to pick its language, then carry on typing where you were.',
       platforms: ['darwin', 'windows', 'linux'],
     },
+    {
+      id: 'sidebar-shortcuts',
+      title: 'Sidebar shortcuts',
+      body: 'Press ⌘6–⌘9 to open your first four pinned notes, and hold ⌘ to see the shortcut beside every sidebar item.',
+      platforms: ['darwin', 'windows', 'linux'],
+    },
   ],
 }
