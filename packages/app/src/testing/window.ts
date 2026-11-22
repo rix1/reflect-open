@@ -46,6 +46,10 @@ export interface TestWindowService extends WindowService {
   setFocusedWindowLabel(label: string | null): void
   hidden(): boolean
   devtoolsToggles(): number
+  /**
+   * Every {@link WindowService.setFullscreen} call, in order.
+   */
+  fullscreenCalls(): readonly boolean[]
 }
 
 export interface TestWindowServiceOptions {
@@ -67,6 +71,8 @@ class TestWindowServiceImpl implements TestWindowService {
   #focused: string | null
   #isHidden = false
   #toggles = 0
+  #fullscreen = false
+  readonly #fullscreenCalls: boolean[] = []
 
   readonly label: string
 
@@ -134,6 +140,19 @@ class TestWindowServiceImpl implements TestWindowService {
 
   hide(): void {
     this.#isHidden = true
+  }
+
+  isFullscreen(): boolean {
+    return this.#fullscreen
+  }
+
+  setFullscreen(fullscreen: boolean): void {
+    this.#fullscreen = fullscreen
+    this.#fullscreenCalls.push(fullscreen)
+  }
+
+  fullscreenCalls(): readonly boolean[] {
+    return [...this.#fullscreenCalls]
   }
 
   toggleDevtools(): void {

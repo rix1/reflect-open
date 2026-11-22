@@ -300,7 +300,8 @@ export function DailyStream({ target }: DailyStreamProps): ReactElement {
             <section
               key={date}
               data-index={index}
-              className="border-b border-border py-6"
+              // `reflect-daily-day` is focus mode's hook (index.css).
+              className="reflect-daily-day border-b border-border py-6"
               // Focus entering this row (clicking its editor, tabbing in) makes
               // it the day the sidebar describes.
               onFocusCapture={() => {
@@ -337,7 +338,7 @@ export function DailyStream({ target }: DailyStreamProps): ReactElement {
         }}
       </Virtualizer>
       {/* Trailing room so the last day isn't pinned to the viewport bottom */}
-      <div aria-hidden className="h-60" />
+      <div aria-hidden className="reflect-daily-tail h-60" />
     </div>
   )
 }
