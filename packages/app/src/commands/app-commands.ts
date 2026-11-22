@@ -37,6 +37,7 @@ export type AppCommandId =
   | 'audioMemo.toggle'
   | 'theme.toggle'
   | 'sidebar.toggle'
+  | 'view.toggleFocusMode'
   | 'settings.open'
   | 'whatsNew.show'
   | 'shortcuts.show'
@@ -248,6 +249,11 @@ export const APP_COMMANDS = {
     title: 'Toggle sidebar',
     keywords: ['collapse', 'expand', 'navigation', 'focus'],
     keybinding: 'Mod-\\',
+  },
+  'view.toggleFocusMode': {
+    title: 'Toggle focus mode',
+    keywords: ['zen', 'distraction', 'writing', 'typewriter', 'full screen', 'dim'],
+    keybinding: 'Mod-Shift-f',
   },
   'settings.open': {
     title: 'Open settings',

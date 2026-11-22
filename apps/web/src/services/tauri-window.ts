@@ -68,6 +68,14 @@ class TauriWindowHostImpl implements WindowHost {
   async hide(): Promise<void> {
     await getCurrentWindow().hide()
   }
+
+  async isFullscreen(): Promise<boolean> {
+    return await getCurrentWindow().isFullscreen()
+  }
+
+  async setFullscreen(fullscreen: boolean): Promise<void> {
+    await getCurrentWindow().setFullscreen(fullscreen)
+  }
 }
 
 /**
