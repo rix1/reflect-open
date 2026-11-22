@@ -31,6 +31,12 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: 'Before you type, search now lists the notes you opened most recently.',
       platforms: ALL_PLATFORMS,
     },
+    {
+      id: 'focus-mode',
+      title: 'Focus mode',
+      body: 'Press ⌘⇧F to hide everything but the note, fade all but the sentence you are writing, and keep your line in the middle of the screen, with a live word count in the corner. Tune it in Settings → Focus mode.',
+      platforms: ['darwin', 'windows', 'linux'],
+    },
   ],
   '0.19.0': [
     {

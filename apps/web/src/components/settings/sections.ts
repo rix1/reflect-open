@@ -6,6 +6,7 @@
 export const SETTINGS_SECTIONS = [
   { id: 'appearance', title: 'Appearance' },
   { id: 'editor', title: 'Editor' },
+  { id: 'focus-mode', title: 'Focus mode' },
   { id: 'date-time', title: 'Date & time' },
   { id: 'templates', title: 'Note templates' },
   { id: 'all-notes', title: 'All notes' },

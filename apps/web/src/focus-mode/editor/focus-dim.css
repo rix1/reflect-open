@@ -1,0 +1,63 @@
+/* Imported by `focus-mode-editor-extensions.tsx`, so dimming styles travel
+   with the extension that sets `data-focus-dim`. Un-layered on purpose: these
+   rules must beat meowdown's layered styles. */
+/* Focus dimming (`data-focus-dim`, `focus-dim.ts`). The extension
+   decorates only the textblock holding the caret: `.reflect-focus-current` on
+   the block, and in sentence mode `.reflect-focus-sentence` over the current
+   sentence plus `.reflect-focus-dim` over the rest of the block. Every other
+   textblock dims as a whole. Textblocks dim, never their containers (list
+   items, blockquotes, table cells), so nothing compounds through nesting, and
+   every descendant takes one flat color, so links, syntax, tags and
+   highlighted code dim along with the text. A color, not opacity: WebKit
+   mis-blends translucent text layers. */
+.ProseMirror[data-focus-dim] {
+  --focus-dim-color: color-mix(in oklab, var(--meowdown-text) 30%, transparent);
+
+  :is(p, h1, h2, h3, h4, h5, h6, pre):not(.reflect-focus-current, .reflect-focus-current *),
+  :is(p, h1, h2, h3, h4, h5, h6, pre):not(.reflect-focus-current, .reflect-focus-current *) *,
+  .reflect-focus-dim,
+  .reflect-focus-dim * {
+    color: var(--focus-dim-color);
+  }
+
+  /* A highlight's background dims with its text: everywhere in a dimmed
+     block, and in the current block when it lies wholly outside the
+     sentence. */
+  :is(p, h1, h2, h3, h4, h5, h6, pre):not(.reflect-focus-current, .reflect-focus-current *) mark,
+  mark:has(.reflect-focus-dim):not(:has(.reflect-focus-sentence)) {
+    background: color-mix(in oklab, var(--meowdown-highlight) 30%, transparent);
+  }
+
+  /* In the current block, an element whose text all lies outside the sentence
+     dims as a whole: a link's underline and an atom's preview are painted by
+     the element, not by the decorated text inside it. */
+  .reflect-focus-current :has(.reflect-focus-dim):not(:has(.reflect-focus-sentence)),
+  .reflect-focus-current :has(.reflect-focus-dim):not(:has(.reflect-focus-sentence)) * {
+    color: var(--focus-dim-color);
+  }
+
+  /* List markers dim unless their item's first block is the current one. The
+     variables are set on the marker itself, not the item, so a nested current
+     item does not inherit them. */
+  .prosemirror-flat-list:not(:has(> .list-content > .reflect-focus-current:first-child)) {
+    & > .list-marker {
+      --meowdown-bullet: var(--focus-dim-color);
+      --meowdown-bullet-collapsed: var(--focus-dim-color);
+      color: var(--focus-dim-color);
+    }
+
+    & > .list-marker input[type='checkbox'] {
+      border-color: var(--focus-dim-color);
+    }
+
+    & > .list-marker input[type='checkbox']:checked {
+      border-color: transparent;
+      background-color: var(--focus-dim-color);
+    }
+
+    /* The ordered list number. */
+    &::before {
+      color: var(--focus-dim-color);
+    }
+  }
+}
