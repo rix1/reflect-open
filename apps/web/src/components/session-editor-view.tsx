@@ -148,9 +148,14 @@ export function SessionEditorView({
       // consumed only once the attempt is over: a daily-stream row can still
       // be hidden (unmeasured) when its editor mounts.
       const cancelAutoFocus = autoFocus
-        ? focusEditorWhenShown(handle, autoFocusSelection, () => paneRef.current, () => {
-            onAutoFocused?.()
-          })
+        ? focusEditorWhenShown(
+            handle,
+            autoFocusSelection,
+            () => paneRef.current,
+            () => {
+              onAutoFocused?.()
+            },
+          )
         : undefined
       return () => {
         cancelAutoFocus?.()

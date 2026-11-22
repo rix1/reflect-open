@@ -1,8 +1,14 @@
+import { noop } from '@ocavue/utils'
 import { page, userEvent } from 'vitest/browser'
 import { afterEach, beforeEach, describe, expect, it, onTestFinished } from 'vitest'
 import type { ReactElement } from 'react'
 import { createSystemClock, dailyPath, formatDayLabel, type GraphInfo } from '@reflect/core'
-import { createTestCoreServices, createTestNoteFileService, seedNotes } from '@reflect/core/testing'
+import {
+  createTestCoreServices,
+  createTestDatabaseService,
+  createTestNoteFileService,
+  seedNotes,
+} from '@reflect/core/testing'
 import { getIsoToday } from '@reflect/utils'
 import type { Route } from '@reflect/app'
 import { PaletteProvider } from '@/components/command-palette/palette-provider.tsx'
@@ -16,7 +22,6 @@ import { SidebarProvider } from '@/providers/sidebar-provider.tsx'
 import { V1ImportProvider } from '@/providers/v1-import-provider.tsx'
 import { useRouterActions } from '@/routing/router.tsx'
 import { renderInApp } from '@/test-utils/render-in-app.tsx'
-import { createWasmTestDatabaseService } from '@/test-utils/test-database.ts'
 import { WorkspaceContent } from './workspace-content.tsx'
 
 /**
@@ -42,7 +47,7 @@ const TODAY_MD = '- first line\n- last line\n'
 
 function renderWorkspace(route: Route) {
   const core = createTestCoreServices({
-    database: createWasmTestDatabaseService(),
+    database: createTestDatabaseService(),
     clock: createSystemClock(),
     noteFile: createTestNoteFileService({
       files: { [dailyPath(today)]: TODAY_MD, 'notes/other.md': '# Other\n\nBody.\n' },
@@ -59,7 +64,7 @@ function renderWorkspace(route: Route) {
         <NoteTemplatesProvider>
           <SidebarProvider>
             <AudioMemoProvider graph={GRAPH}>
-              <DeepLinkProvider>
+              <DeepLinkProvider search={noop}>
                 <FocusedDailyProvider>
                   <NoteFindProvider>
                     <V1ImportProvider>
