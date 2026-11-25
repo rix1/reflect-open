@@ -1,5 +1,5 @@
 import { plainTextLines } from './plain-text-lines.ts'
-import { projectTasks } from './task-ast.ts'
+import { projectTasks } from './task-project.ts'
 
 /**
  * Writing statistics (focus mode's counter): what a writer wants to know
