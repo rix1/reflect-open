@@ -34,6 +34,7 @@ export type AppCommandId =
   | 'note.copyDeepLink'
   | 'note.copyPath'
   | 'note.revealInFinder'
+  | 'note.copyRelativePath'
   | 'note.print'
   | 'note.random'
   | 'template.insert'
@@ -233,6 +234,11 @@ export const APP_COMMANDS = {
     keywords: ['file', 'folder', 'show', 'location', 'explorer', 'file manager'],
     // Zed's Reveal in Finder chord.
     keybinding: 'Alt-Mod-r',
+  },
+  'note.copyRelativePath': {
+    title: 'Copy relative note path',
+    keywords: ['file', 'name', 'filename', 'relative', 'clipboard', 'cli', 'agent'],
+    keybinding: 'Mod-Shift-c',
   },
   'note.print': {
     title: 'Print note…',

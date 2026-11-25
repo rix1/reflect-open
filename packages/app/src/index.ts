@@ -141,6 +141,7 @@ export {
   publishGistAndCopyLink,
 } from './commands/clipboard-actions.ts'
 export { revealNoteInFileManager } from './commands/reveal-note.ts'
+export { copyNoteRelativePath } from './commands/copy-relative-path.ts'
 export { type CommandHandler, type CommandService } from './commands/command-service.ts'
 export { formatBinding } from './commands/keybindings.ts'
 export { type KeymapService } from './commands/keymap-service.ts'

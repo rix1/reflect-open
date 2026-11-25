@@ -2,6 +2,7 @@ import {
   attachFilesToNote,
   copyNoteDeepLink,
   copyNotePath,
+  copyNoteRelativePath,
   publishGistAndCopyLink,
   revealNoteInFileManager,
   routeForPath,
@@ -75,6 +76,10 @@ export function useNoteCommands(path: string | null): void {
   useCommandHandler(
     'note.revealInFinder',
     path === null ? undefined : () => revealNoteInFileManager(services, app, path),
+  )
+  useCommandHandler(
+    'note.copyRelativePath',
+    path === null ? undefined : () => copyNoteRelativePath(app, path),
   )
   // In the daily stream `path` is the focused day, so only that day prints.
   useCommandHandler(

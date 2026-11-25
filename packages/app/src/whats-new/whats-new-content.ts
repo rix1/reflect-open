@@ -46,6 +46,12 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: 'Press ⌥⌘R, or choose File → Reveal in Finder, to show the note’s file in Finder.',
       platforms: ['darwin'],
     },
+    {
+      id: 'copy-relative-note-path',
+      title: 'Copy a note’s relative path',
+      body: 'Press ⇧⌘C to copy the note’s path inside the graph, such as notes/plan.md. ⌥⌘C still copies the full path.',
+      platforms: ['darwin'],
+    },
   ],
   '0.19.1': [
     {
