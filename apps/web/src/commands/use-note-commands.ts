@@ -3,6 +3,7 @@ import {
   copyNoteDeepLink,
   copyNotePath,
   publishGistAndCopyLink,
+  revealNoteInFileManager,
   routeForPath,
 } from '@reflect/app'
 import { noteEditorHandleFor } from '@/editor/editor-handle-registry.ts'
@@ -70,6 +71,10 @@ export function useNoteCommands(path: string | null): void {
   useCommandHandler(
     'note.copyPath',
     path === null ? undefined : () => copyNotePath(services, app, path),
+  )
+  useCommandHandler(
+    'note.revealInFinder',
+    path === null ? undefined : () => revealNoteInFileManager(services, app, path),
   )
   // In the daily stream `path` is the focused day, so only that day prints.
   useCommandHandler(

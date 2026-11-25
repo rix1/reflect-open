@@ -33,6 +33,7 @@ export type AppCommandId =
   | 'note.attachFile'
   | 'note.copyDeepLink'
   | 'note.copyPath'
+  | 'note.revealInFinder'
   | 'note.print'
   | 'note.random'
   | 'template.insert'
@@ -226,6 +227,12 @@ export const APP_COMMANDS = {
     keywords: ['file', 'absolute', 'filesystem', 'clipboard', 'location'],
     // Finder's Copy-as-Pathname chord.
     keybinding: 'Alt-Mod-c',
+  },
+  'note.revealInFinder': {
+    title: 'Reveal note in Finder',
+    keywords: ['file', 'folder', 'show', 'location', 'explorer', 'file manager'],
+    // Zed's Reveal in Finder chord.
+    keybinding: 'Alt-Mod-r',
   },
   'note.print': {
     title: 'Print note…',
