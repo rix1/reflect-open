@@ -40,6 +40,12 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: `Press Ctrl+P ${PRINT_BODY}`,
       platforms: ['windows', 'linux'],
     },
+    {
+      id: 'reveal-note-in-finder',
+      title: 'Reveal notes in Finder',
+      body: 'Press ⌥⌘R, or choose File → Reveal in Finder, to show the note’s file in Finder.',
+      platforms: ['darwin'],
+    },
   ],
   '0.19.1': [
     {
