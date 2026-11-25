@@ -90,6 +90,7 @@ export const APP_MENU_LAYOUT: readonly AppSubmenuLayout[] = [
       command('history.forward'),
       separator(),
       command('sidebar.toggle'),
+      command('view.toggleFocusMode'),
       separator(),
       command('dev.toggleDevtools'),
     ],
