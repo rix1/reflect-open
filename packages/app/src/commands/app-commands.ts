@@ -30,6 +30,7 @@ export type AppCommandId =
   | 'note.attachFile'
   | 'note.copyDeepLink'
   | 'note.copyPath'
+  | 'note.copyRelativePath'
   | 'note.print'
   | 'note.random'
   | 'template.insert'
@@ -217,6 +218,12 @@ export const APP_COMMANDS = {
     keywords: ['file', 'absolute', 'filesystem', 'clipboard', 'location'],
     // Finder's Copy-as-Pathname chord.
     keybinding: 'Alt-Mod-c',
+  },
+  'note.copyRelativePath': {
+    title: 'Copy relative note path',
+    keywords: ['file', 'name', 'filename', 'relative', 'clipboard', 'cli', 'agent'],
+    // Zed's Copy Relative Path chord, the Shift twin of Copy note path.
+    keybinding: 'Alt-Mod-Shift-c',
   },
   'note.print': {
     title: 'Print note…',

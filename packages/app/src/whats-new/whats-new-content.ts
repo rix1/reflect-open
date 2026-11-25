@@ -40,6 +40,12 @@ export const WHATS_NEW: Readonly<Record<string, readonly WhatsNewItem[]>> = {
       body: `Press Ctrl+P ${PRINT_BODY}`,
       platforms: ['windows', 'linux'],
     },
+    {
+      id: 'copy-relative-note-path',
+      title: 'Copy a note’s relative path',
+      body: 'Press ⇧⌥⌘C to copy the note’s path inside the graph, such as notes/plan.md. ⌥⌘C still copies the full path.',
+      platforms: ['darwin'],
+    },
   ],
   '0.19.1': [
     {
