@@ -6,7 +6,6 @@ import {
 } from '@reflect/core/testing'
 import { createTestAppServices, type TestAppServices } from '../testing/services.ts'
 import { APP_COMMANDS } from './app-commands.ts'
-import { normalizeBinding } from './keybindings.ts'
 import { copyNoteRelativePath } from './copy-relative-path.ts'
 
 let core: TestCoreServices
@@ -43,10 +42,7 @@ describe('copyNoteRelativePath', () => {
 })
 
 describe('note.copyRelativePath', () => {
-  // Zed's pair: ⌥⌘C copies the absolute path, ⇧⌥⌘C the relative one.
-  it('is ⌥⌘C with Shift', () => {
-    const relative = APP_COMMANDS['note.copyRelativePath'].keybinding
-    const absolute = APP_COMMANDS['note.copyPath'].keybinding
-    expect(normalizeBinding(relative, true)).toBe(normalizeBinding(`Shift-${absolute}`, true))
+  it('is bound to ⇧⌘C', () => {
+    expect(APP_COMMANDS['note.copyRelativePath'].keybinding).toBe('Mod-Shift-c')
   })
 })

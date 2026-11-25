@@ -222,8 +222,7 @@ export const APP_COMMANDS = {
   'note.copyRelativePath': {
     title: 'Copy relative note path',
     keywords: ['file', 'name', 'filename', 'relative', 'clipboard', 'cli', 'agent'],
-    // Zed's Copy Relative Path chord, the Shift twin of Copy note path.
-    keybinding: 'Alt-Mod-Shift-c',
+    keybinding: 'Mod-Shift-c',
   },
   'note.print': {
     title: 'Print note…',
